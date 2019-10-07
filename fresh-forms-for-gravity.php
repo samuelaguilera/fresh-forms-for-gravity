@@ -1,11 +1,10 @@
 <?php
 /**
  * Plugin Name: Fresh Forms for Gravity
- * Plugin URI: http://www.samuelaguilera.com
  * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
  * Author: Samuel Aguilera
  * Version: 1.0
- * Author URI: http://www.samuelaguilera.com
+ * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
  * License: GPL3
