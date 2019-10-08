@@ -20,7 +20,6 @@ It should work with any caching plugin with support for DONOTCACHEPAGE constant,
 * W3 Total Cache
 * WP Rocket
 * Autoptimize
-* SG Optimizer
 * Comet Cache
 * LiteSpeed Cache
 * Hummingbird
@@ -30,6 +29,7 @@ It should work with any caching plugin with support for DONOTCACHEPAGE constant,
 ### Caching plugins **not supported**:
 
 * Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching.
+* SG Optimizer. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. Although it supports excluding GF scripts from minification and async loading, so this is supported.
 
 ### CloudFlare and other proxies:
 

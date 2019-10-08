@@ -36,7 +36,6 @@ Caching plugins **supported**:
 * W3 Total Cache
 * WP Rocket
 * Autoptimize
-* SG Optimizer
 * Comet Cache
 * LiteSpeed Cache
 * Hummingbird
@@ -47,6 +46,7 @@ Caching plugins **NOT supported**:
 ----------------------------------
 
 * Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching.
+* SG Optimizer. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. Although it supports excluding GF scripts from minification and async loading, so this is supported.
 
 CloudFlare and other proxies:
 -----------------------------
