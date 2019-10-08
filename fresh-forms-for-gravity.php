@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.0' );
 
 add_action( 'gform_loaded', array( 'Fresh_Forms_For_Gravity_Bootstrap', 'load' ), 5 );
-register_activation_hook( __FILE__, 'sar_purge_all_cache' );
+register_activation_hook( __FILE__, 'fffg_purge_all_cache' );
 
 /**
  * Class Fresh_Forms_For_Gravity_Bootstrap
@@ -80,7 +80,7 @@ function fresh_forms_for_gravity() {
 /**
  * Purge everything for a fresh start... This is required in order to allow donotcache_and_headers() to run before caching a page.
  */
-function sar_purge_all_cache() {
+function fffg_purge_all_cache() {
 
 	// W3TC.
 	if ( function_exists( 'w3tc_pgcache_flush' ) ) {
