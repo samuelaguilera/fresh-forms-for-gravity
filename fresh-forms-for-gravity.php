@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
  * Author: Samuel Aguilera
- * Version: 1.0
+ * Version: 1.1
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.0' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.1' );
 
 add_action( 'gform_loaded', array( 'Fresh_Forms_For_Gravity_Bootstrap', 'load' ), 5 );
 register_activation_hook( __FILE__, 'fffg_purge_all_cache' );
@@ -81,6 +81,22 @@ function fresh_forms_for_gravity() {
  * Purge everything for a fresh start... This is required in order to allow donotcache_and_headers() to run before caching a page.
  */
 function fffg_purge_all_cache() {
+
+	// WP Engine.
+	if ( class_exists( 'WpeCommon' ) ) {
+		if ( method_exists( 'WpeCommon', 'purge_memcached' ) ) {
+			WpeCommon::purge_memcached();
+		}
+		if ( method_exists( 'WpeCommon', 'clear_maxcdn_cache' ) ) {
+			WpeCommon::clear_maxcdn_cache();
+		}
+		if ( method_exists( 'WpeCommon', 'purge_varnish_cache' ) ) {
+			WpeCommon::purge_varnish_cache();
+		}
+
+		// WPE doesn't allow third-party caching plugins https://wpengine.com/blog/no-caching-plugins/ so we can stop here for WPE hosted sites.
+		return;
+	}
 
 	// W3TC.
 	if ( function_exists( 'w3tc_pgcache_flush' ) ) {

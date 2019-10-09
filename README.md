@@ -25,6 +25,7 @@ It should work with any caching plugin with support for DONOTCACHEPAGE constant,
 * Hummingbird
 * WP Optimize
 * WP Fastest Cache
+* WP Engine System
 
 ### Caching plugins **not supported**:
 

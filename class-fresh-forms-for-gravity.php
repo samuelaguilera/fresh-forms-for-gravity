@@ -153,14 +153,16 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 */
 	public function maybe_no_cache( $post_id ) {
 
+		$post = get_post( $post_id );
+
 		// Running only for posts (any type) and pages.
-		if ( ! is_single( $post_id ) && ! is_page( $post_id ) ) {
+		if ( ! is_single( $post->ID ) && ! is_page( $post->ID ) ) {
 			$this->log_debug( __METHOD__ . '(): Not single post or page.' );
 			return false;
 		}
 
 		$this->log_debug( __METHOD__ . '(): Calling has_gf() for post ID ' . $post_id );
-		$has_gf = $this->has_gf( $post_id, $post->post_content );
+		$has_gf = $this->has_gf( $post->ID, $post->post_content );
 
 		// No shortcode and no block? Do nothing.
 		if ( ! in_array( 'yes', $has_gf, true ) ) {
@@ -189,6 +191,21 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		$this->log_debug( __METHOD__ . '(): Keep it fresh!' );
 
 		// Delete existing cache? No. Why? If the page is cached no PHP will be executed for the page, so we can't do anything.
+
+		// WP Engine.
+		if ( class_exists( 'WpeCommon' ) ) {
+			/*
+			 * No support for DONOTCACHEPAGE and not filters available. They only allow a few cookies to exclude pages from caching.
+			 * Value is not important really, but I'm using a nonce anyway.
+			 */
+			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 60 );
+
+			/*
+			 * WPE doesn't allow third-party caching plugins https://wpengine.com/blog/no-caching-plugins/
+			 * and Cache-Control header modification is not allowed either, so we can stop here for WPE hosted sites.
+			 */
+			return;
+		}
 
 		// Prevent post (currently not cached) to be cached by plugins.
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
