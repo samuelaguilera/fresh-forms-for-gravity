@@ -155,12 +155,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		$post = get_post( $post_id );
 
-		// Running only for posts (any type) and pages.
-		if ( ! is_single( $post->ID ) && ! is_page( $post->ID ) ) {
-			$this->log_debug( __METHOD__ . '(): Not single post or page.' );
-			return false;
-		}
-
 		$this->log_debug( __METHOD__ . '(): Calling has_gf() for post ID ' . $post_id );
 		$has_gf = $this->has_gf( $post->ID, $post->post_content );
 
@@ -179,6 +173,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	public function donotcache_and_headers() {
 
 		global $post;
+
+		// Running only for posts (any type) and pages.
+		if ( ! is_single() && ! is_page() ) {
+			return;
+		}
 
 		$has_gf = $this->maybe_no_cache( $post->ID );
 
@@ -244,6 +243,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	public function wpfc_blockCache() {
 
 		global $post;
+
+		// Running only for posts (any type) and pages.
+		if ( ! is_single() && ! is_page() ) {
+			return;
+		}
 
 		$has_gf = $this->maybe_no_cache( $post->ID );
 

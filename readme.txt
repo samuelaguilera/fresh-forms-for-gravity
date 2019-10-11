@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare
 Requires at least: 4.9
 Tested up to: 5.2.1
-Stable tag: 1.1
+Stable tag: 1.1.1
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -64,6 +64,10 @@ Other proxy services should work in a similar way, but I don't have access to te
 Just install and activate, no settings page.
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Fixed a few notices.
 
 = 1.1 =
 
