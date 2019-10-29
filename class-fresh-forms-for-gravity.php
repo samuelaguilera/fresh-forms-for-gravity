@@ -191,19 +191,27 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		// Delete existing cache? No. Why? If the page is cached no PHP will be executed for the page, so we can't do anything.
 
-		// WP Engine.
+		// WP Engine System cookie.
 		if ( class_exists( 'WpeCommon' ) ) {
 			/*
 			 * No support for DONOTCACHEPAGE and not filters available. They only allow a few cookies to exclude pages from caching.
 			 * Value is not important really, but I'm using a nonce anyway.
 			 */
-			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 60 );
+			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), time() + MINUTE_IN_SECONDS, "/$post->post_name/" );
+			$this->log_debug( __METHOD__ . "(): Cookie set for WP Engine System. Path: /$post->post_name/" );
 
 			/*
 			 * WPE doesn't allow third-party caching plugins https://wpengine.com/blog/no-caching-plugins/
 			 * and Cache-Control header modification is not allowed either, so we can stop here for WPE hosted sites.
 			 */
 			return;
+		}
+
+		// SG Optimizer cookie.
+		if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
+			header( 'X-Cache-Enabled: False', true );
+			setcookie( 'wpSGCacheBypass', 1, time() + MINUTE_IN_SECONDS, "/$post->post_name/" );
+			$this->log_debug( __METHOD__ . "(): Cookie set for SG Optimizer. Path: /$post->post_name/" );
 		}
 
 		// Prevent post (currently not cached) to be cached by plugins.

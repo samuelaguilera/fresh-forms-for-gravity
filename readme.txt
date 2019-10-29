@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare
 Requires at least: 4.9
-Tested up to: 5.2.1
-Stable tag: 1.1.1
+Tested up to: 5.2.4
+Stable tag: 1.1.2
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -39,12 +39,12 @@ Caching plugins **supported**:
 * WP Optimize
 * WP Fastest Cache
 * WP Engine System
+* SG Optimizer
 
 Caching plugins **NOT supported**:
 ----------------------------------
 
 * Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching.
-* SG Optimizer. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. Although it supports excluding GF scripts from minification and async loading, so this is supported.
 
 CloudFlare and other proxies:
 -----------------------------
@@ -64,6 +64,11 @@ Other proxy services should work in a similar way, but I don't have access to te
 Just install and activate, no settings page.
 
 == Changelog ==
+
+= 1.1.2 =
+
+* Improved WP Engine System support.
+* Added support for SG Optimizer.
 
 = 1.1.1 =
 
