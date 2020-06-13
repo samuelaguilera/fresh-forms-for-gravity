@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.4.1
-Stable tag: 1.1.5
+Tested up to: 5.4.2
+Stable tag: 1.1.6
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -50,7 +50,11 @@ Caching plugins **NOT supported**:
 CloudFlare and other proxies:
 -----------------------------
 
-This plugin will add appropriate HTTP header to pages with a Gravity Forms to exlude the page HTML from caching. By default CloudFlare doesn't cache the page HTML, it does only when you have configured it to "Cache Everything". In this case, after activating the plugin, you need to purge cache in your CloudFlare account or wait for cache expiration to let CloudFlare know the page must be excluded from caching.
+This plugin will add appropriate HTTP header to pages with a Gravity Forms to exlude the page HTML from caching when the web host setup allows it. 
+
+By default CloudFlare doesn't cache the page HTML, it does only when you have configured it to "Cache Everything". In this case, after activating the plugin, you need to purge cache in your CloudFlare account or wait for cache expiration to let CloudFlare know the page must be excluded from caching.
+
+Certain hosts like **WP Engine and Kinsta don't allow HTTP headers modification from WordPress side of things**, therefore CloudFlare support will not work for these hosts.
 
 Other proxy services should work in a similar way, but I don't have access to test any other proxy service. Feel to reach me if you want to provide me access to add support for your proxy service (documentation for the proxy would be required).
 
@@ -72,6 +76,10 @@ Just install and activate, no settings page.
 As stated on this plugin description it supports the LiteSpeed Cache plugin, not LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install LiteSpeed Cache plugin before installing Fresh Forms for Gravity.
 
 == Changelog ==
+
+= 1.1.6 =
+
+* Added additional checking for Gravity Forms shortcode and blocks when a reusable block is used. Thanks to Richard Wawrzyniak.
 
 = 1.1.5 =
 

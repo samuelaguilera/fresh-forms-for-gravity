@@ -131,28 +131,53 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			'block'     => false,
 		);
 
-		// Check for a GF shortcode.
-		if ( has_shortcode( $post_content, 'gravityform' ) ) {
-			// Shortcode found!
-			$has_gf['shortcode'] = 'yes';
-			$this->log_debug( __METHOD__ . '(): GF shortcode detected in post ID ' . $post_id );
+		// Check for GF shortcode.
+		$has_gf['shortcode'] = $this->find_gf_shortcode( $post_content, $has_gf );
+		if ( 'yes' === $has_gf['shortcode'] ) {
+			return $has_gf;
 		}
 
-		// Check for a GF block.
+		// Check for a GF block or GF form in a reusable block.
 		if ( function_exists( 'has_block' ) ) {
 
-			$gf_blocks = array( 'gravityforms/block', 'gravityforms/mailchimp', 'gravityforms/form' );
+			if ( false === has_blocks( $post_id ) ) {
+				$this->log_debug( __METHOD__ . "(): Post ID {$post_id} has no blocks." );
+				return $has_gf;
+			} else {
+				$this->log_debug( __METHOD__ . "(): Post ID {$post_id} has at least one block. Checking if there's a GF form... " );
+			}
 
-			foreach ( $gf_blocks as $gf_block ) {
+			// Check for GF blocks.
+			$has_gf['block'] = $this->find_gf_blocks( $post_content, $has_gf );
+			if ( 'yes' === $has_gf['block'] ) {
+				return $has_gf;
+			}
 
-				if ( has_block( $gf_block, $post_content ) ) {
+			// Additional check for GF forms in reusable blocks.
+			$blocks = parse_blocks( $post_content );
 
-					// Block found!
-					$has_gf['block'] = 'yes';
-					$this->log_debug( __METHOD__ . '(): GF block detected in post ID ' . $post_id );
+			foreach ( $blocks as $block ) {
+				if ( empty( $block['blockName'] ) || empty( $block['attrs']['ref'] ) ) {
+					continue;
+				}
 
-					// No need to keep running.
-					break;
+				// Check core/block found.
+				if ( 'core/block' === $block['blockName'] ) {
+					$reusable_block = get_post( $block['attrs']['ref'] );
+
+					if ( empty( $reusable_block ) || 'wp_block' !== $reusable_block->post_type ) {
+						continue;
+					}
+
+					$this->log_debug( __METHOD__ . '(): Found reusable block: ' . $reusable_block->post_content );
+
+					$has_gf['shortcode'] = $this->find_gf_shortcode( $reusable_block->post_content, $has_gf );
+					if ( 'yes' === $has_gf['shortcode'] ) {
+						return $has_gf;
+					}
+
+					$has_gf['block'] = $this->find_gf_blocks( $reusable_block->post_content, $has_gf );
+
 				}
 			}
 		}
@@ -160,6 +185,52 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		// Return array with results.
 		return $has_gf;
 
+	}
+
+	/**
+	 * Check if there's a GF shortcode.
+	 *
+	 * @param string $post_content      Post content.
+	 * @param array  $has_gf            Contains values for GF form detection results.
+	 */
+	public function find_gf_shortcode( $post_content, $has_gf ) {
+
+		// Check for a GF shortcode.
+		if ( has_shortcode( $post_content, 'gravityform' ) ) {
+			// Shortcode found!
+			$has_gf['shortcode'] = 'yes';
+			$this->log_debug( __METHOD__ . '(): GF shortcode detected!' );
+		}
+
+			return $has_gf['shortcode'];
+	}
+
+	/**
+	 * Check if there's a GF block.
+	 *
+	 * @param string $post_content      Post content.
+	 * @param array  $has_gf            Contains values for GF form detection results.
+	 */
+	public function find_gf_blocks( $post_content, $has_gf ) {
+
+		// Get GF blocks registered.
+		$gf_blocks = GF_Blocks::get_all_types();
+
+		// Checking for GF blocks.
+		foreach ( $gf_blocks as $gf_block ) {
+
+			if ( has_block( $gf_block, $post_content ) ) {
+
+				// Block found!
+				$has_gf['block'] = 'yes';
+				$this->log_debug( __METHOD__ . '(): GF block detected! ' );
+
+				// GF Block found, no need to keep running.
+				break;
+			}
+		}
+
+			return $has_gf['block'];
 	}
 
 	/**
