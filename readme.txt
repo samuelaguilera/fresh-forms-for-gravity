@@ -1,9 +1,9 @@
 === Fresh Forms for Gravity ===
 Contributors: samuelaguilera
-Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare
+Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.2.4
-Stable tag: 1.1.2
+Tested up to: 5.4.1
+Stable tag: 1.1.5
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -29,17 +29,18 @@ It should work with any caching plugin with support for DONOTCACHEPAGE constant,
 Caching plugins **supported**:
 ---------------------------------------------------------------------
 
-* WP Super Cache
-* W3 Total Cache
-* WP Rocket
 * Autoptimize
 * Comet Cache
-* LiteSpeed Cache
 * Hummingbird
-* WP Optimize
-* WP Fastest Cache
-* WP Engine System
+* Kinsta Cache
+* LiteSpeed Cache
 * SG Optimizer
+* W3 Total Cache
+* WP Engine System
+* WP Fastest Cache
+* WP Optimize
+* WP Rocket
+* WP Super Cache
 
 Caching plugins **NOT supported**:
 ----------------------------------
@@ -58,12 +59,25 @@ Other proxy services should work in a similar way, but I don't have access to te
 * PHP 7.0 or higher.
 * WordPress 4.9 or higher.
 * Gravity Forms 2.3 or higher.
+* Only forms embedded using classic editor shortcode or Gutenberg block are supported.
 
 = Usage =
 
 Just install and activate, no settings page.
 
+== Frequently Asked Questions ==
+
+= The plugin is not working in LiteSpeed server =
+
+As stated on this plugin description it supports the LiteSpeed Cache plugin, not LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install LiteSpeed Cache plugin before installing Fresh Forms for Gravity.
+
 == Changelog ==
+
+= 1.1.5 =
+
+* Added support for Kinsta Cache.
+* Added support for Autoptimize.
+* Minor tweaks to SG Optimizer and WP Engine System support.
 
 = 1.1.2 =
 

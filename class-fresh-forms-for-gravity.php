@@ -22,7 +22,7 @@ GFForms::include_addon_framework();
 class Fresh_Forms_For_Gravity extends GFAddOn {
 
 	protected $_version                  = FRESH_FORMS_FOR_GRAVITY_VERSION;
-	protected $_min_gravityforms_version = '1.9';
+	protected $_min_gravityforms_version = '2.3';
 	protected $_slug                     = 'fresh_forms';
 	protected $_path                     = 'fresh-forms-for-gravity/fresh-forms-for-gravity.php';
 	protected $_full_path                = __FILE__;
@@ -99,6 +99,22 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 			return $exclude_list;
 		}
+
+		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts' );
+		/**
+		 * Exclude Gravity Forms scripts from Autoptimize.
+		 *
+		 * @param string $js_excluded Comma separated list of scripts filenames.
+		 */
+		function autoptimize_exclude_gf_scripts( $js_excluded ) {
+			$minify_excluded .= ', gravityforms.min.js, conditional_logic.min.js';
+			$minify_excluded .= ', jquery.textareaCounter.plugin.min.js, jquery.json.min.js';
+			$minify_excluded .= ', chosen.jquery.min.js, jquery.maskedinput.min.js';
+			$minify_excluded .= ', datepicker.min.js, placeholders.jquery.min.js';
+
+			return $js_excluded;
+		}
+
 	}
 
 	/**
@@ -197,7 +213,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			 * No support for DONOTCACHEPAGE and not filters available. They only allow a few cookies to exclude pages from caching.
 			 * Value is not important really, but I'm using a nonce anyway.
 			 */
-			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), time() + MINUTE_IN_SECONDS, "/$post->post_name/" );
+			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 0, "/$post->post_name/" );
 			$this->log_debug( __METHOD__ . "(): Cookie set for WP Engine System. Path: /$post->post_name/" );
 
 			/*
@@ -207,10 +223,24 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return;
 		}
 
+		// Kinsta Cache.
+		if ( class_exists( 'Kinsta\Cache' ) && ! is_admin() && ! is_user_logged_in() ) {
+			/*
+			 * No support for DONOTCACHEPAGE, not filters available, no special cookies. Even no interface for cache exclusion!
+			 * They really don't want to allow you to decide which pages to exclude from their cache by your own.
+			 * That's a bad practice in my opinion. So we have only a dirty hack to avoid caching ¯\_(ツ)_/¯
+			 */
+			setcookie( 'wordpress_logged_in_' . wp_hash( 'pleasekinstaaddsupportfordonotcachepageconstant' ), 1, 0, "/$post->post_name/" );
+			$this->log_debug( __METHOD__ . "(): Cookie set for Kinsta Cache. Path: /$post->post_name/" );
+
+			// As far as I know Kinsta doesn't forbid the use of other caching plugins. So let's Fresh Forms continue...
+
+		}
+
 		// SG Optimizer cookie.
 		if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
 			header( 'X-Cache-Enabled: False', true );
-			setcookie( 'wpSGCacheBypass', 1, time() + MINUTE_IN_SECONDS, "/$post->post_name/" );
+			setcookie( 'wpSGCacheBypass', 1, 0, "/$post->post_name/" );
 			$this->log_debug( __METHOD__ . "(): Cookie set for SG Optimizer. Path: /$post->post_name/" );
 		}
 
@@ -237,6 +267,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		if ( ! defined( 'LSCWP_OBJECT_CACHE' ) ) {
 			define( 'LSCWP_OBJECT_CACHE', false );
 		}
+
+		// Autoptimize. What's the point of minifiying scripts that were excluded?
+		add_filter( 'autoptimize_filter_js_minify_excluded', '__return_false' );
 
 		// Sets the nocache headers to prevent caching by browsers and proxies respecting these headers.
 		nocache_headers();
