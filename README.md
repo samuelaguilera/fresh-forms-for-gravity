@@ -16,17 +16,18 @@ It should work with any caching plugin with support for DONOTCACHEPAGE constant,
 
 ### Caching plugins **supported**:
 
-* WP Super Cache
-* W3 Total Cache
-* WP Rocket
 * Autoptimize
 * Comet Cache
-* LiteSpeed Cache
 * Hummingbird
-* WP Optimize
-* WP Fastest Cache
-* WP Engine System
+* Kinsta Cache
+* LiteSpeed Cache
 * SG Optimizer
+* W3 Total Cache
+* WP Engine System
+* WP Fastest Cache
+* WP Optimize
+* WP Rocket
+* WP Super Cache
 
 ### Caching plugins **not supported**:
 

@@ -148,7 +148,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 
 			// Check for GF blocks.
-			$has_gf['block'] = $this->find_gf_blocks( $post_content, $has_gf );
+			$has_gf['block'] = $this->find_gf_block( $post_content, $has_gf );
 			if ( 'yes' === $has_gf['block'] ) {
 				return $has_gf;
 			}
@@ -157,28 +157,26 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$blocks = parse_blocks( $post_content );
 
 			foreach ( $blocks as $block ) {
-				if ( empty( $block['blockName'] ) || empty( $block['attrs']['ref'] ) ) {
+
+				// Skip block if empty or not a core/block.
+				if ( empty( $block['blockName'] ) || 'core/block' !== $block['blockName'] || empty( $block['attrs']['ref'] ) ) {
 					continue;
 				}
 
 				// Check core/block found.
-				if ( 'core/block' === $block['blockName'] ) {
-					$reusable_block = get_post( $block['attrs']['ref'] );
+				$reusable_block = get_post( $block['attrs']['ref'] );
 
-					if ( empty( $reusable_block ) || 'wp_block' !== $reusable_block->post_type ) {
-						continue;
-					}
-
-					$this->log_debug( __METHOD__ . '(): Found reusable block: ' . $reusable_block->post_content );
-
-					$has_gf['shortcode'] = $this->find_gf_shortcode( $reusable_block->post_content, $has_gf );
-					if ( 'yes' === $has_gf['shortcode'] ) {
-						return $has_gf;
-					}
-
-					$has_gf['block'] = $this->find_gf_blocks( $reusable_block->post_content, $has_gf );
-
+				if ( empty( $reusable_block ) || 'wp_block' !== $reusable_block->post_type ) {
+					continue;
 				}
+
+				$has_gf['shortcode'] = $this->find_gf_shortcode( $reusable_block->post_content, $has_gf );
+				if ( 'yes' === $has_gf['shortcode'] ) {
+					return $has_gf;
+				}
+
+				$has_gf['block'] = $this->find_gf_block( $reusable_block->post_content, $has_gf );
+
 			}
 		}
 
@@ -188,7 +186,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Check if there's a GF shortcode.
+	 * Check post content provided for a GF shortcode.
 	 *
 	 * @param string $post_content      Post content.
 	 * @param array  $has_gf            Contains values for GF form detection results.
@@ -206,12 +204,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Check if there's a GF block.
+	 * Check post content provided for a GF block.
 	 *
 	 * @param string $post_content      Post content.
 	 * @param array  $has_gf            Contains values for GF form detection results.
 	 */
-	public function find_gf_blocks( $post_content, $has_gf ) {
+	public function find_gf_block( $post_content, $has_gf ) {
 
 		// Get GF blocks registered.
 		$gf_blocks = GF_Blocks::get_all_types();
