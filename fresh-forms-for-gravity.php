@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.1.5' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.1.6' );
 
 add_action( 'gform_loaded', array( 'Fresh_Forms_For_Gravity_Bootstrap', 'load' ), 5 );
 register_activation_hook( __FILE__, 'fffg_purge_all_cache' );
