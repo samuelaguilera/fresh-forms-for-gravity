@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.4.2
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -76,6 +76,10 @@ Just install and activate, no settings page.
 As stated on this plugin description it supports the LiteSpeed Cache plugin, not LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install LiteSpeed Cache plugin before installing Fresh Forms for Gravity.
 
 == Changelog ==
+
+= 1.1.7 =
+
+* Prevent issues with form redirection inline script due to SG Optimizer combine scripts feature. Thanks to Richard Wawrzyniak.
 
 = 1.1.6 =
 

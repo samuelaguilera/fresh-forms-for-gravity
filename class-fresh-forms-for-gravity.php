@@ -100,6 +100,19 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return $exclude_list;
 		}
 
+		// Prevent issues with inline script for confirmations redirection and SGO.
+		add_filter( 'sgo_javascript_combine_excluded_inline_content', 'sgo_exclude_inline_script' );
+
+		/**
+		 * Exclude Gravity Forms scripts from SGO minification and async loading.
+		 *
+		 * @param array $exclude_list First few symbols of inline content script.
+		 */
+		function sgo_exclude_inline_script( $exclude_list ) {
+			$exclude_list[] = 'gformRedirect';
+			return $exclude_list;
+		}
+
 		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts' );
 		/**
 		 * Exclude Gravity Forms scripts from Autoptimize.
