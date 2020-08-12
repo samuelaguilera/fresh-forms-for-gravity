@@ -183,7 +183,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$minify_excluded .= ', jquery.textareaCounter.plugin.min.js, jquery.json.min.js';
 			$minify_excluded .= ', chosen.jquery.min.js, jquery.maskedinput.min.js';
 			$minify_excluded .= ', datepicker.min.js, placeholders.jquery.min.js';
-			$minify_excluded .= ', frontend.min.js, coupons.min.js, a11y.min.js'; // frontend.min.js is used by payment add-ons.
+			$minify_excluded .= ', frontend.min.js, coupons.min.js, a11y.min.js'; // frontend.min.js is used by several add-ons.
+			$minify_excluded .= ', gpoll.min.js';
 
 			return $js_excluded;
 		}
