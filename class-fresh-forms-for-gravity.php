@@ -79,41 +79,100 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		add_filter( 'sgo_js_minify_exclude', 'sgo_exclude_gf_scripts' );
 		// Current branch of Gravity Forms (2.4), by default, doesn't support async loading of scripts.
 		add_filter( 'sgo_js_async_exclude', 'sgo_exclude_gf_scripts' );
+		// Prevent combination of GF scripts when SGO Combine JavaScript Files is enabled.
+		add_filter( 'sgo_javascript_combine_exclude', 'sgo_exclude_gf_scripts' );
 
 		/**
-		 * Exclude Gravity Forms scripts from SGO minification and async loading.
+		 * Exclude Gravity Forms scripts from SGO minification, async loading, and JS combination.
 		 *
 		 * @param array $exclude_list List of script handlers to exclude.
 		 */
 		function sgo_exclude_gf_scripts( $exclude_list ) {
 
+			$exclude_list[] = 'jquery'; // Yeah, not a GF script but many of them (and themes, and etc...) have it as dependency.
+			$exclude_list[] = 'gform_gravityforms';
 			$exclude_list[] = 'gform_conditional_logic';
 			$exclude_list[] = 'gform_datepicker_init';
 			$exclude_list[] = 'plupload-all';
 			$exclude_list[] = 'gform_json';
-			$exclude_list[] = 'gform_gravityforms';
 			$exclude_list[] = 'gform_textarea_counter';
 			$exclude_list[] = 'gform_masked_input';
 			$exclude_list[] = 'gform_chosen';
 			$exclude_list[] = 'gform_placeholder';
+			$exclude_list[] = 'gforms_zxcvbn';
+			$exclude_list[] = 'gf_partial_entries'; // Partial Entries Add-On.
+			$exclude_list[] = 'stripe.js'; // Stripe Add-On.
+			$exclude_list[] = 'stripe_v3';
+			$exclude_list[] = 'gforms_stripe_frontend';
+			$exclude_list[] = 'gform_coupon_script'; // Coupons Add-On.
+			$exclude_list[] = 'gforms_ppcp_frontend'; // PPCP Add-On.
+			$exclude_list[] = 'gform_paypal_sdk'; // Dependency for PPCP.
+			$exclude_list[] = 'wp-a11y'; // Dependency for PPCP. This and the following three lines fixed issues with a PPCP form.
+			$exclude_list[] = 'wp-dom-ready'; // Dependency for wp-a11y.
+			$exclude_list[] = 'wp-polyfill'; // Dependency for wp-a11y.
+			$exclude_list[] = 'wp-i18n'; // Dependency for wp-a11y.
+			$exclude_list[] = 'gforms_square_frontend'; // Square Add-On.
+			$exclude_list[] = 'gform_mollie_components'; // Mollie Add-On.
+			$exclude_list[] = 'gform_chained_selects'; // Chained Selects Add-On.
+			$exclude_list[] = 'gsurvey_js'; // Survey Add-On.
+			$exclude_list[] = 'gpoll_js'; // Polls Add-On.
 
 			return $exclude_list;
 		}
 
-		// Prevent issues with inline script for confirmations redirection and SGO.
-		add_filter( 'sgo_javascript_combine_excluded_inline_content', 'sgo_exclude_inline_script' );
+		// Prevent combination of inline GF scripts when SGO Combine JavaScript Files is enabled. This prevents issues with confirmations redirection.
+		add_filter( 'sgo_javascript_combine_excluded_inline_content', 'sgo_exclude_inline_gf_scripts' );
 
 		/**
-		 * Exclude Gravity Forms scripts from SGO minification and async loading.
+		 * Exclude Gravity Forms inline scripts from SGO "Combine JavaScript Files" feature.
 		 *
 		 * @param array $exclude_list First few symbols of inline content script.
 		 */
-		function sgo_exclude_inline_script( $exclude_list ) {
+		function sgo_exclude_inline_gf_scripts( $exclude_list ) {
 			$exclude_list[] = 'gformRedirect';
+			$exclude_list[] = 'var gf_global';
+			$exclude_list[] = 'gformInitSpinner';
+			$exclude_list[] = 'var gf_partial_entries';
+			$exclude_list[] = '(function(d,s,i,r)'; // HubSpot Tracking Script.
+			$exclude_list[] = 'gform.addAction';
+			$exclude_list[] = 'gform_post_render';
+			$exclude_list[] = 'var gforms_ppcp_frontend_strings'; // PPCP Add-On.
+
+			return $exclude_list;
+		}
+
+		// This fixes a "contains errors" issue with the Signature page.
+		add_filter( 'sgo_html_minify_exclude_params', 'sgo_exclude_gf_pages_html_minify' );
+
+		/**
+		 * Exclude Gravity Forms Signature and downloads URL's from SGO Minify the HTML Output feature.
+		 *
+		 * @param array $exclude_params Query params that you want to exclude.
+		 */
+		function sgo_exclude_gf_pages_html_minify( $exclude_params ) {
+			$exclude_params[] = 'signature'; // Signatures.
+			$exclude_params[] = 'gf-download'; // Downloads.
+
+			return $exclude_params;
+		}
+
+		add_filter( 'sgo_javascript_combine_excluded_external_paths', 'sgo_exclude_js_combine_external_scripts' );
+
+		/**
+		 * Exclude sensitive external scripts sources from SGO "Combine JavaScript Files" feature.
+		 *
+		 * @param array $exclude_list Domains that you want to exclude.
+		 */
+		function sgo_exclude_js_combine_external_scripts( $exclude_list ) {
+			$exclude_list[] = 'stripe.com';
+			$exclude_list[] = 'paypal.com';
+			$exclude_list[] = 'mollie.com';
+
 			return $exclude_list;
 		}
 
 		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts' );
+
 		/**
 		 * Exclude Gravity Forms scripts from Autoptimize.
 		 *
@@ -124,6 +183,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$minify_excluded .= ', jquery.textareaCounter.plugin.min.js, jquery.json.min.js';
 			$minify_excluded .= ', chosen.jquery.min.js, jquery.maskedinput.min.js';
 			$minify_excluded .= ', datepicker.min.js, placeholders.jquery.min.js';
+			$minify_excluded .= ', frontend.min.js, coupons.min.js, a11y.min.js'; // frontend.min.js is used by payment add-ons.
 
 			return $js_excluded;
 		}
@@ -319,7 +379,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		}
 
-		// SG Optimizer cookie.
+		// SG Optimizer cookie. This will turn off both x-cache and proxy-cache.
 		if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
 			header( 'X-Cache-Enabled: False', true );
 			setcookie( 'wpSGCacheBypass', 1, 0, "/$post->post_name/" );

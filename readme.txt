@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.4.2
-Stable tag: 1.1.7
+Tested up to: 5.5
+Stable tag: 1.2
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -77,9 +77,12 @@ As stated on this plugin description it supports the LiteSpeed Cache plugin, not
 
 == Changelog ==
 
-= 1.1.7 =
+= 1.2 =
 
-* Prevent issues with form redirection inline script due to SG Optimizer combine scripts feature. Thanks to Richard Wawrzyniak.
+* Added an exclusion for SG Optimizer to prevent an issue with form redirection inline script due to the "Combine JavaScript Files" feature, that despite of its name also affects to inline scripts. Thanks to Richard Wawrzyniak.
+* Added an exclusion for SG Optimizer to prevent an issue with the Signature page not displaying the image due to the "Minify the HTML Output" feature. Thanks to Travis Lopes.
+* Added an exclusion for SG Optimizer to prevent an issue with the PayPal Commerce Platform Add-On due to the "Defer Render-blocking JS" feature.
+* Added additional exclusions of inline JS and files for SG Optimizer.
 
 = 1.1.6 =
 
