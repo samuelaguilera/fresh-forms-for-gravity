@@ -212,14 +212,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		// Check for a GF block or GF form in a reusable block.
-		if ( function_exists( 'has_block' ) ) {
+		if ( function_exists( 'has_block' ) && true === has_blocks( $post_id ) ) {
 
-			if ( false === has_blocks( $post_id ) ) {
-				$this->log_debug( __METHOD__ . "(): Post ID {$post_id} has no blocks." );
-				return $has_gf;
-			} else {
-				$this->log_debug( __METHOD__ . "(): Post ID {$post_id} has at least one block. Checking if there's a GF form... " );
-			}
+			$this->log_debug( __METHOD__ . "(): Post ID {$post_id} has at least one block. Checking if there's a GF form... " );
 
 			// Check for GF blocks.
 			$has_gf['block'] = $this->find_gf_block( $post_content, $has_gf );
@@ -251,6 +246,18 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 				$has_gf['block'] = $this->find_gf_block( $reusable_block->post_content, $has_gf );
 
+			}
+		}
+
+		// Look for a GF shortcode inside ACF fields.
+		if ( class_exists( 'ACF' ) ) {
+			$acf_fields = get_field_objects( $post_id );
+
+			$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg' );
+
+			// Check only for supported ACF fields.
+			if ( is_array( $acf_fields ) && in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
+				$has_gf = $this->find_gf_acf_field( $acf_fields, $has_gf );
 			}
 		}
 
@@ -304,6 +311,37 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 			return $has_gf['block'];
 	}
+
+
+	/**
+	 * Check ACF field content provided for a GF shortcode or form.
+	 *
+	 * @param array   $acf_fields ACF Fields saved for the post.
+	 * @param array   $has_gf     Contains values for GF form detection results.
+	 * @param integer $post_id    Post ID number.
+	 */
+	public function find_gf_acf_field( $acf_fields, $has_gf ) {
+
+		foreach ( $acf_fields as $acf_field ) {
+
+			if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) {
+				$has_gf['shortcode'] = $this->find_gf_shortcode( $acf_field['value'], $has_gf );
+				if ( 'yes' === $has_gf['shortcode'] ) {
+					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
+					return $has_gf;
+				}
+			} else {
+				if ( strpos( $acf_field['value'], 'gform_wrapper' ) !== false ) {
+					$has_gf['shortcode'] = 'yes';
+					$this->log_debug( __METHOD__ . '(): ACF WYSIWYG field has a GF form!' );
+					return $has_gf;
+				}
+			}
+		}
+
+		return $has_gf;
+	}
+
 
 	/**
 	 * Check if we're in a post/page and has the shortcode or block.

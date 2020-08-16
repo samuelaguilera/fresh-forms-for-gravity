@@ -77,6 +77,10 @@ As stated on this plugin description it supports the LiteSpeed Cache plugin, not
 
 == Changelog ==
 
+= 1.2.1 =
+
+* Added support to detect a Gravity Forms form embedded into ACF fields of the following types: text, texarea, wysiwyg
+
 = 1.2 =
 
 * Added an exclusion for SG Optimizer to prevent an issue with form redirection inline script due to the "Combine JavaScript Files" feature, that despite of its name also affects to inline scripts. Thanks to Richard Wawrzyniak.
