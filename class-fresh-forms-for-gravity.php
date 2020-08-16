@@ -253,10 +253,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		if ( class_exists( 'ACF' ) ) {
 			$acf_fields = get_field_objects( $post_id );
 
-			$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg' );
-
-			// Check only for supported ACF fields.
-			if ( is_array( $acf_fields ) && in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
+			if ( is_array( $acf_fields ) ) {
 				$has_gf = $this->find_gf_acf_field( $acf_fields, $has_gf );
 			}
 		}
@@ -316,13 +313,17 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	/**
 	 * Check ACF field content provided for a GF shortcode or form.
 	 *
-	 * @param array   $acf_fields ACF Fields saved for the post.
-	 * @param array   $has_gf     Contains values for GF form detection results.
-	 * @param integer $post_id    Post ID number.
+	 * @param array $acf_fields ACF Fields saved for the post.
+	 * @param array $has_gf     Contains values for GF form detection results.
 	 */
 	public function find_gf_acf_field( $acf_fields, $has_gf ) {
 
+		$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg' );
+
 		foreach ( $acf_fields as $acf_field ) {
+			if ( ! in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
+				continue;
+			}
 
 			if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) {
 				$has_gf['shortcode'] = $this->find_gf_shortcode( $acf_field['value'], $has_gf );
