@@ -8,7 +8,7 @@ Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
 
-Prevents supported caching plugins, browsers and proxies from caching post/pages where a Gravity Forms shortcode or Gutenberg block is used.
+Automatically exclude from cache posts (any type) or pages where the content has a Gravity Forms shortcode or block. WooCommerce products and ACF are also suported.
 
 == Description ==
 
@@ -19,12 +19,18 @@ An easy solution is to configure your caching plugin or proxy to exclude the pag
 This plugin will take care of the above automatically doing the following:
 
 1. Flush current cache on plugin activation. This is **required** in order to allow the next step to run.
-2. Dynamically check if there's a Gravity Forms shortcode or Gutenberg block in your post (any post type) or page **content** using WordPress core functions for it.
+2. Dynamically check if there's a Gravity Forms shortcode or Gutenberg block in your post (any post type) or page **content** using WordPress core functions for it. WooCommerce is also supported, and ACF support can be enabled too (see FAQ).
 If so, it will prevent post/page caching for supported caching plugins, browsers and CDN/Proxies.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
 It should work with any caching plugin with support for DONOTCACHEPAGE constant, and proxies respecting the use Cache-Control HTTP header.
+
+Content and embedding methods **supported**:
+---------------------------------------------------------------------
+* Gravity Forms shortcode or block added to the post content. This covers standard WP posts, pages, and custom post types (including WooCommerce products).
+* Shortcode added to ACF custom fields of the following types: text, texarea, wysiwyg. These fields can be standalone fields, or subfields of a Flexible Content field type. Other field types are not supported currently. Note that ACF support is disabled by default, see FAQ for more details.
+* Form added to a WooCommerce product using WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
 
 Caching plugins **supported**:
 ---------------------------------------------------------------------
@@ -73,13 +79,22 @@ Just install and activate, no settings page.
 
 = The plugin is not working in LiteSpeed server =
 
-As stated on this plugin description it supports the LiteSpeed Cache plugin, not LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install LiteSpeed Cache plugin before installing Fresh Forms for Gravity.
+As stated on this plugin description it supports the **LiteSpeed Cache plugin**, NOT LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install [LiteSpeed Cache plugin](https://wordpress.org/plugins/litespeed-cache/) before installing Fresh Forms for Gravity.
+
+= I want to enable ACF support =
+
+To enable ACF support add the following line to your theme's functions.php file or a custom functionality plugin.
+
+`add_filter( 'freshforms_acf_support', '__return_true' );`
 
 == Changelog ==
 
-= 1.2.1 =
+= 1.2.4 =
 
-* Added support to detect a Gravity Forms form embedded into ACF fields of the following types: text, texarea, wysiwyg
+* Added more SG Optimizer exclusions.
+* Added support to detect a Gravity Forms form embedded into ACF fields of the following types: text, texarea, wysiwyg, flexible_content
+* Added support to detect a Gravity Forms form embedded into WooCommerce product using WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
+* Minor code changes.
 
 = 1.2 =
 
