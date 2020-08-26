@@ -250,8 +250,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 		}
 
+		// WooCommerce Gravity Forms Product Add-ons support enabled by default.
+		$wcgfpa_support = apply_filters( 'freshforms_wcgfpa_support', true );
+
 		// Look for a GF form added to a product using WooCommerce Gravity Forms Product Add-ons.
-		if ( class_exists( 'WC_GFPA_Main' ) && 'product' === $post->post_type ) {
+		if ( class_exists( 'WC_GFPA_Main' ) && true === $wcgfpa_support && 'product' === $post->post_type ) {
 			$wc_gfpa_settings = get_post_meta( $post->ID, '_gravity_form_data', true );
 			if ( ! empty( $wc_gfpa_settings ) && is_numeric( $wc_gfpa_settings['id'] ) ) {
 				$this->log_debug( __METHOD__ . "(): Product ID {$post->ID} has GF form {$wc_gfpa_settings['id']} added as product add-ons form." );
