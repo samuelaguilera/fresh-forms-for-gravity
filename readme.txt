@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.5
-Stable tag: 1.2
+Stable tag: 1.2.4
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -92,7 +92,7 @@ To enable ACF support add the following line to your theme's functions.php file 
 = 1.2.4 =
 
 * Added more SG Optimizer exclusions.
-* Added support to detect a Gravity Forms form embedded into ACF fields of the following types: text, texarea, wysiwyg, flexible_content
+* Added support to detect a Gravity Forms form embedded into ACF fields of the following types as standalone fields and also as subfields of a Flexible Content field: Text, Text Area, WYSIWYG.
 * Added support to detect a Gravity Forms form embedded into WooCommerce product using WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
 * Minor code changes.
 
