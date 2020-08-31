@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.5
-Stable tag: 1.2.4
+Stable tag: 1.2.8
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -19,8 +19,16 @@ An easy solution is to configure your caching plugin or proxy to exclude the pag
 This plugin will take care of the above automatically doing the following:
 
 1. Flush current cache on plugin activation. This is **required** in order to allow the next step to run.
-2. Dynamically check if there's a Gravity Forms shortcode or Gutenberg block in your post (any post type) or page **content** using WordPress core functions for it. WooCommerce is also supported, and ACF support can be enabled too (see FAQ).
-If so, it will prevent post/page caching for supported caching plugins, browsers and CDN/Proxies.
+2. Dynamically check if there's a Gravity Forms for any of the supported embedding methods (see below for the list).
+3. If so, it will prevent post/page from being cached by any of the supported caching plugins, browsers and CDN/Proxies.
+
+= Embedding methods supported: =
+
+* WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
+* WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
+* ACF fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
+* Elementor. The following widgets added to the post content are supported: Shortcode, Text.
+* Essential Addons for Elementor Gravity Forms widget.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
@@ -83,11 +91,20 @@ As stated on this plugin description it supports the **LiteSpeed Cache plugin**,
 
 = I want to enable ACF support =
 
+ACF fields of the following types are supported as standalone fields and also as subfields of a Flexible Content or Repeater field: Text, Text Area, WYSIWYG.
+
 To enable ACF support add the following line to your theme's functions.php file or a custom functionality plugin.
 
 `add_filter( 'freshforms_acf_support', '__return_true' );`
 
 == Changelog ==
+
+= 1.2.8 =
+
+* Added support to detect a Gravity Forms form embedded into ACF fields of Text, Text Area, and WYSIWYG type as subfields of a Repeater field.
+* Added support for Essential Addons for Elementor Gravity Forms widget.
+* Fixed a warning when the post has an ACF Flexible Content field but is empty.
+* Refactoring of some code.
 
 = 1.2.4 =
 

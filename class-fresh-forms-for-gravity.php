@@ -200,16 +200,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 */
 	public function check_gf( $post ) {
 
-		// Setting initial values for the $has_gf array.
-		$has_gf = array(
-			'shortcode' => false,
-			'block'     => false,
-		);
-
 		// Check for GF shortcode.
-		$has_gf['shortcode'] = $this->find_gf_shortcode( $post->post_content, $has_gf );
-		if ( 'yes' === $has_gf['shortcode'] ) {
-			return $has_gf;
+		if ( true === $this->find_gf_shortcode( $post->post_content ) ) {
+			return true;
 		}
 
 		// Check for a GF block or GF form in a reusable block.
@@ -218,9 +211,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$this->log_debug( __METHOD__ . "(): Post ID {$post->ID} has at least one block. Checking if there's a GF form... " );
 
 			// Check for GF blocks.
-			$has_gf['block'] = $this->find_gf_block( $post->post_content, $has_gf );
-			if ( 'yes' === $has_gf['block'] ) {
-				return $has_gf;
+			if ( true === $this->find_gf_block( $post->post_content ) ) {
+				return true;
 			}
 
 			// Additional check for GF forms in reusable blocks.
@@ -240,13 +232,23 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 					continue;
 				}
 
-				$has_gf['shortcode'] = $this->find_gf_shortcode( $reusable_block->post_content, $has_gf );
-				if ( 'yes' === $has_gf['shortcode'] ) {
-					return $has_gf;
+				if ( true === $this->find_gf_shortcode( $reusable_block->post_content ) || true === $this->find_gf_block( $reusable_block->post_content ) ) {
+					return true;
 				}
+			}
+		}
 
-				$has_gf['block'] = $this->find_gf_block( $reusable_block->post_content, $has_gf );
+		/**
+		 * Support for Essential Addons for Elementor Gravity Forms widget.
+		 * It runs only if Elementor builder is enabled for the post, otherwise you should remove the form HTML and use a shortcode or Gutenber block instead.
+		 */
+		if ( class_exists( 'Essential_Addons_Elementor\\Classes\\Bootstrap' ) && 'builder' === get_post_meta( $post->ID, '_elementor_edit_mode', true ) ) {
+			// Essential Addons for Elementor Gravity Forms removes gform_wrapper for some reason, gform_fields would be an alternative.
+			$elementor_data = get_post_meta( $post->ID, '_elementor_data', true );
 
+			if ( strpos( $elementor_data, 'eael-gravity-form' ) !== false ) {
+				$this->log_debug( __METHOD__ . '(): Essential Addons for Elementor Gravity Forms widget detected!' );
+				return true;
 			}
 		}
 
@@ -258,8 +260,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$wc_gfpa_settings = get_post_meta( $post->ID, '_gravity_form_data', true );
 			if ( ! empty( $wc_gfpa_settings ) && is_numeric( $wc_gfpa_settings['id'] ) ) {
 				$this->log_debug( __METHOD__ . "(): Product ID {$post->ID} has GF form {$wc_gfpa_settings['id']} added as product add-ons form." );
-				$has_gf['shortcode'] = 'yes';
-				return $has_gf;
+				return true;
 			}
 		}
 
@@ -270,13 +271,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		if ( class_exists( 'ACF' ) && true === $acf_support ) {
 			$acf_fields = get_field_objects( $post->ID );
 
-			if ( is_array( $acf_fields ) ) {
-				$has_gf = $this->find_gf_acf_field( $acf_fields, $has_gf );
+			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields ) ) {
+				return true;
 			}
 		}
 
-		// Return array with results.
-		return $has_gf;
+		// If we're here, there's no form.
+		return false;
 
 	}
 
@@ -284,27 +285,25 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 * Check post content provided for a GF shortcode.
 	 *
 	 * @param string $post_content      Post content.
-	 * @param array  $has_gf            Contains values for GF form detection results.
 	 */
-	public function find_gf_shortcode( $post_content, $has_gf ) {
+	public function find_gf_shortcode( $post_content ) {
 
 		// Check for a GF shortcode.
 		if ( has_shortcode( $post_content, 'gravityform' ) ) {
 			// Shortcode found!
-			$has_gf['shortcode'] = 'yes';
 			$this->log_debug( __METHOD__ . '(): GF shortcode detected!' );
+			return true;
 		}
-
-			return $has_gf['shortcode'];
+		// If we're here, there's no GF shortcode.
+		return false;
 	}
 
 	/**
 	 * Check post content provided for a GF block.
 	 *
 	 * @param string $post_content      Post content.
-	 * @param array  $has_gf            Contains values for GF form detection results.
 	 */
-	public function find_gf_block( $post_content, $has_gf ) {
+	public function find_gf_block( $post_content ) {
 
 		// Get GF blocks registered.
 		$gf_blocks = GF_Blocks::get_all_types();
@@ -313,29 +312,39 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		foreach ( $gf_blocks as $gf_block ) {
 
 			if ( has_block( $gf_block, $post_content ) ) {
-
 				// Block found!
-				$has_gf['block'] = 'yes';
 				$this->log_debug( __METHOD__ . '(): GF block detected! ' );
-
-				// GF Block found, no need to keep running.
-				break;
+				return true;
 			}
 		}
-
-			return $has_gf['block'];
+		// If we're here, there's no GF block.
+		return false;
 	}
 
+	/**
+	 * Check post content provided for Gravity Forms class.
+	 *
+	 * @param string $post_content      Post content.
+	 */
+	public function find_gform_class( $post_content ) {
+		// Look for the gform_wrapper.
+		if ( strpos( $post_content, 'gform_wrapper' ) !== false ) {
+			// gform_wrapper found!
+			$this->log_debug( __METHOD__ . '(): gform_wrapper detected!' );
+			return true;
+		}
+		// If we're here, there's no GF form class.
+		return false;
+	}
 
 	/**
 	 * Check ACF field content provided for a GF shortcode or form.
 	 *
 	 * @param array $acf_fields ACF Fields saved for the post.
-	 * @param array $has_gf     Contains values for GF form detection results.
 	 */
-	public function find_gf_acf_field( $acf_fields, $has_gf ) {
+	public function find_gf_acf_field( $acf_fields ) {
 
-		$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg', 'flexible_content' );
+		$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg', 'flexible_content', 'repeater' );
 
 		foreach ( $acf_fields as $acf_field ) {
 			if ( ! in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
@@ -343,35 +352,32 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 
 			if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) { // Look for a GF shortcode inside a standalone text or textarea fields.
-				$has_gf['shortcode'] = $this->find_gf_shortcode( $acf_field['value'], $has_gf );
-				if ( 'yes' === $has_gf['shortcode'] ) {
+				if ( true === $this->find_gf_shortcode( $acf_field['value'] ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-					return $has_gf;
+					return true;
 				}
-			} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for the gform_wrapper class inside a standalone wysiwyg field.
-				if ( strpos( $acf_field['value'], 'gform_wrapper' ) !== false ) {
-					$has_gf['shortcode'] = 'yes';
+			} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
+				if ( true === $this->find_gform_class( $acf_field['value'] ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-					return $has_gf;
+					return true;
 				}
-			} elseif ( 'flexible_content' === $acf_field['type'] ) {
-				// Look for a GF shortcode or gform_wrapper class inside the value of any sub-field for a flexible_content field.
+			} elseif ( ( 'flexible_content' === $acf_field['type'] || 'repeater' === $acf_field['type'] ) && ! empty( $acf_field['value'] ) ) {
+				// Look for a GF shortcode or GF class inside the value of any sub-field for a flexible_content field.
 				foreach ( $acf_field['value'] as $acf_subfield_array ) {
 					foreach ( $acf_subfield_array as $key => $value ) {
-						$has_gf['shortcode'] = $this->find_gf_shortcode( $value, $has_gf );
-						if ( 'yes' === $has_gf['shortcode'] ) {
+						if ( true === $this->find_gf_shortcode( $value ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-							return $has_gf;
-						} elseif ( strpos( $value, 'gform_wrapper' ) !== false ) {
-							$has_gf['shortcode'] = 'yes';
+							return true;
+						} elseif ( true === $this->find_gform_class( $value ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-							return $has_gf;
+							return true;
 						}
 					}
 				}
 			}
 		}
-		return $has_gf;
+		// If we're here, there's no ACF field with a GF form.
+		return false;
 	}
 
 
@@ -384,15 +390,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		$post = get_post( $post_id );
 
-		$this->log_debug( __METHOD__ . '(): Calling check_gf() for post ID ' . $post_id );
-		$has_gf = $this->check_gf( $post );
-
-		// No shortcode and no block? Do nothing.
-		if ( ! in_array( 'yes', $has_gf, true ) ) {
-			$this->log_debug( __METHOD__ . '(): No form found, nothing to do...' );
+		// No Gravity Forms form detected? Do nothing.
+		if ( false === $this->check_gf( $post ) ) {
+			$this->log_debug( __METHOD__ . "(): No form found for Post ID {$post_id}, nothing to do..." );
 			return false;
 		}
 
+		$this->log_debug( __METHOD__ . "(): Form found for Post ID {$post_id}..." );
 		return true;
 	}
 
@@ -403,15 +407,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		global $post;
 
-		// Running only for posts (any type) and pages.
-		if ( ! is_single() && ! is_page() ) {
+		// Running only for single posts (any type) and pages.
+		if ( ! is_singular() ) {
 			return;
 		}
 
-		$has_gf = $this->maybe_no_cache( $post->ID );
-
 		// No shortcode and no block? Do nothing.
-		if ( false === $has_gf ) {
+		if ( false === $this->maybe_no_cache( $post->ID ) ) {
 			return;
 		}
 
@@ -503,10 +505,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return;
 		}
 
-		$has_gf = $this->maybe_no_cache( $post->ID );
-
 		// No shortcode and no block? Do nothing.
-		if ( false === $has_gf ) {
+		if ( false === $this->maybe_no_cache( $post->ID ) ) {
 			return;
 		}
 
