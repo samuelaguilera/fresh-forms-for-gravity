@@ -2,7 +2,7 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.5
+Tested up to: 5.5.1
 Stable tag: 1.2.8
 Requires PHP: 7.0
 License: GPLv3
@@ -25,20 +25,16 @@ This plugin will take care of the above automatically doing the following:
 = Embedding methods supported: =
 
 * WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
-* WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
-* ACF fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
 * Elementor. The following widgets added to the post content are supported: Shortcode, Text.
 * Essential Addons for Elementor Gravity Forms widget.
+* Divi. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
+* WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
+* ACF fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
+* WP Tools Gravity Forms Divi Module.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
 It should work with any caching plugin with support for DONOTCACHEPAGE constant, and proxies respecting the use Cache-Control HTTP header.
-
-Content and embedding methods **supported**:
----------------------------------------------------------------------
-* Gravity Forms shortcode or block added to the post content. This covers standard WP posts, pages, and custom post types (including WooCommerce products).
-* Shortcode added to ACF custom fields of the following types: text, texarea, wysiwyg. These fields can be standalone fields, or subfields of a Flexible Content field type. Other field types are not supported currently. Note that ACF support is disabled by default, see FAQ for more details.
-* Form added to a WooCommerce product using WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
 
 Caching plugins **supported**:
 ---------------------------------------------------------------------
@@ -98,6 +94,10 @@ To enable ACF support add the following line to your theme's functions.php file 
 `add_filter( 'freshforms_acf_support', '__return_true' );`
 
 == Changelog ==
+
+= 1.2.9 =
+
+* Added support for forms embedded using the WP Tools Gravity Forms Divi Module plugin.
 
 = 1.2.8 =
 

@@ -276,6 +276,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 		}
 
+		// Look for a GF form embedded using WP Tools Gravity Forms Divi Module plugin.
+		if ( class_exists( 'WPT_Divi_Gravity_Modules\\GravityFormExtension' ) && has_shortcode( $post->post_content, 'et_pb_wpt_gravityform' ) ) {
+			$this->log_debug( __METHOD__ . '(): WP Tools Gravity Forms Divi Module detected!' );
+			return true;
+		}
+
 		// If we're here, there's no form.
 		return false;
 
