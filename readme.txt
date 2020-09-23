@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.5.1
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,12 +25,13 @@ This plugin will take care of the above automatically doing the following:
 = Embedding methods supported: =
 
 * WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
-* Elementor. The following widgets added to the post content are supported: Shortcode, Text.
-* Essential Addons for Elementor Gravity Forms widget.
-* Divi. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
-* WooCommerce Gravity Forms Product Add-ons by Lucas Stark.
-* ACF fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
-* WP Tools Gravity Forms Divi Module.
+* **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
+* **Essential Addons for Elementor** Gravity Forms widget.
+* **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
+* **WP Tools Gravity Forms Divi Module**.
+* **WooCommerce Gravity Forms Product Add-ons** by Lucas Stark.
+* **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
+* **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
