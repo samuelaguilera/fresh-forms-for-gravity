@@ -283,6 +283,24 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return true;
 		}
 
+		// UABB Gravity Forms Styler module detection. Beaver Builder Text Editor module doesn't need this.
+		if ( class_exists( 'FLBuilderModel' ) && FLBuilderModel::is_builder_enabled( $post->ID ) ) {
+			$rows = FLBuilderModel::get_nodes( 'row' );
+
+			$module_list = array_reduce(
+				$rows,
+				function( $module_list, $row ) {
+					return array_merge( $module_list, $this->get_row_module_list( $row ) );
+				},
+				array()
+			);
+
+			if ( is_array( $module_list ) && in_array( 'uabb-gravity-form', $module_list, true ) ) {
+				$this->log_debug( __METHOD__ . '(): UABB Gravity Forms Styler module detected!' );
+				return true;
+			}
+		}
+
 		// If we're here, there's no form.
 		return false;
 
@@ -387,6 +405,92 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		return false;
 	}
 
+	/**
+	 * Get the list of Beaver Builder modules in a row.
+	 *
+	 * @param  object $row The row node.
+	 *
+	 * @return array       The list of modules.
+	 */
+	private function get_row_module_list( $row ) {
+		if ( ! FLBuilderModel::is_node_visible( $row ) ) {
+			return array();
+		}
+
+		$groups = FLBuilderModel::get_nodes( 'column-group', $row );
+
+		return array_reduce(
+			$groups,
+			function( $module_list, $group ) {
+				return array_merge( $module_list, $this->get_group_module_list( $group ) );
+			},
+			array()
+		);
+	}
+
+	/**
+	 * Get the list of Beaver Builder modules in a group.
+	 *
+	 * @param  object $group The group node.
+	 *
+	 * @return array         The list of modules.
+	 */
+	private function get_group_module_list( $group ) {
+
+		$cols = FLBuilderModel::get_nodes( 'column', $group );
+
+		return array_reduce(
+			$cols,
+			function( $module_list, $col ) {
+				return array_merge( $module_list, $this->get_column_module_list( $col ) );
+			},
+			array()
+		);
+	}
+
+	/**
+	 * Get the list of Beaver Builder modules for a column.
+	 *
+	 * @param  object $col The column node.
+	 *
+	 * @return array       The list of modules.
+	 */
+	private function get_column_module_list( $col ) {
+		$col = is_object( $col ) ? $col : FLBuilderModel::get_node( $col );
+
+		if ( ! FLBuilderModel::is_node_visible( $col ) ) {
+			return array();
+		}
+
+		$nodes = FLBuilderModel::get_nodes( null, $col );
+
+		return array_reduce(
+			$nodes,
+			function( $module_list, $node ) {
+				return array_merge( $module_list, $this->get_beaver_builder_node_module_list( $node ) );
+			},
+			array()
+		);
+	}
+
+	/**
+	 * Get the list of Beaver Builder modules for a node.
+	 *
+	 * @param object $node The node.
+	 *
+	 * @return array       The modules.
+	 */
+	private function get_beaver_builder_node_module_list( $node ) {
+		$module_list = array();
+
+		if ( 'module' === $node->type && FLBuilderModel::is_module_registered( $node->settings->type ) ) {
+			$module_list[] = $node->settings->type;
+		} elseif ( 'column-group' === $node->type ) {
+			$module_list = array_merge( $module_list, $this->get_group_module_list( $node ) );
+		}
+
+		return $module_list;
+	}
 
 	/**
 	 * Check if we're in a post/page and has the shortcode or block.

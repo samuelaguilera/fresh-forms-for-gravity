@@ -32,6 +32,7 @@ This plugin will take care of the above automatically doing the following:
 * **WooCommerce Gravity Forms Product Add-ons** by Lucas Stark.
 * **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
+* **Ultimate Addons for Beaver Builder** Gravity Forms Styler module.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
@@ -95,6 +96,10 @@ To enable ACF support add the following line to your theme's functions.php file 
 `add_filter( 'freshforms_acf_support', '__return_true' );`
 
 == Changelog ==
+
+= 1.3 =
+
+* Added support to detect UABB Gravity Forms Styler module. Thanks to Kellen Mace for the Beaver Builder module detection code.
 
 = 1.2.10 =
 
