@@ -139,6 +139,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$exclude_list[] = 'gform_post_render';
 			$exclude_list[] = 'var gforms_ppcp_frontend_strings'; // PPCP Add-On.
 			$exclude_list[] = 'gform_page_loaded'; // Multi-page Ajax forms.
+			$exclude_list[] = 'var stripe'; // Stripe Checkout.
 
 			return $exclude_list;
 		}

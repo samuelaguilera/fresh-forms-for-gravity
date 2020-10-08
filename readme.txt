@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.5.1
-Stable tag: 1.2.9
+Stable tag: 1.2.10
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -95,6 +95,10 @@ To enable ACF support add the following line to your theme's functions.php file 
 `add_filter( 'freshforms_acf_support', '__return_true' );`
 
 == Changelog ==
+
+= 1.2.10 =
+
+* Added another SG Optimizer exclusion to prevent SG Optimizer from breaking Stripe Checkout redirection. Thanks to Richard Wawrzyniak.
 
 = 1.2.9 =
 
