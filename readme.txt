@@ -97,7 +97,7 @@ To enable ACF support add the following line to your theme's functions.php file 
 
 == Changelog ==
 
-= 1.3 =
+= 1.2.11 =
 
 * Added support to detect UABB Gravity Forms Styler module. Thanks to Kellen Mace for the Beaver Builder module detection code.
 
