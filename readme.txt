@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.5.1
-Stable tag: 1.2.10
+Stable tag: 1.3
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -97,9 +97,12 @@ To enable ACF support add the following line to your theme's functions.php file 
 
 == Changelog ==
 
-= 1.2.11 =
+= 1.3 =
 
-* Added support to detect UABB Gravity Forms Styler module. Thanks to Kellen Mace for the Beaver Builder module detection code.
+* Added support to detect UABB Gravity Forms Styler module. Thanks to Kellen Mace for the Beaver Builder module detection code https://gist.github.com/kellenmace/add5c45e5bddcdd3271de8fc7d204a18
+* Added new Signature add-on page parameter to SG Optimizer exclusions. Thanks to Richard Wawrzyniak for pointing it.
+* Added additional domains for SG Optimizer external scripts exclusions.
+* Fixed JS scripts exclusions for Autoptimize. Thanks to Richard Wawrzyniak for pointing it.
 
 = 1.2.10 =
 

@@ -154,6 +154,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 */
 		function sgo_exclude_gf_pages_html_minify( $exclude_params ) {
 			$exclude_params[] = 'signature'; // Signatures.
+			$exclude_params[] = 'gf-signature'; // Signatures since 4.0, old links still use the above.
 			$exclude_params[] = 'gf-download'; // Downloads.
 
 			return $exclude_params;
@@ -167,14 +168,22 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $exclude_list Domains that you want to exclude.
 		 */
 		function sgo_exclude_js_combine_external_scripts( $exclude_list ) {
-			$exclude_list[] = 'stripe.com';
-			$exclude_list[] = 'paypal.com';
+			$exclude_list[] = '2checkout.com';
+			$exclude_list[] = 'agilecrm.com';
+			$exclude_list[] = 'dropbox.com';
+			$exclude_list[] = 'js.hs-analytics.net'; // HubSpot Analytics Code.
 			$exclude_list[] = 'mollie.com';
+			$exclude_list[] = 'paypal.com';
+			$exclude_list[] = 'square.com';
+			$exclude_list[] = 'stripe.com';
 
 			return $exclude_list;
 		}
 
-		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts' );
+		// Autoptimize. What's the point of minifiying scripts that were excluded?
+		add_filter( 'autoptimize_filter_js_minify_excluded', '__return_false', 99 ); // Lower priority to ensure it runs after any other.
+		// Add Gravity Forms scripts to the excluded JS list.
+		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts', 99 ); // Lower priority to ensure it runs after any other.
 
 		/**
 		 * Exclude Gravity Forms scripts from Autoptimize.
@@ -182,12 +191,14 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param string $js_excluded Comma separated list of scripts filenames.
 		 */
 		function autoptimize_exclude_gf_scripts( $js_excluded ) {
-			$minify_excluded .= ', gravityforms.min.js, conditional_logic.min.js';
-			$minify_excluded .= ', jquery.textareaCounter.plugin.min.js, jquery.json.min.js';
-			$minify_excluded .= ', chosen.jquery.min.js, jquery.maskedinput.min.js';
-			$minify_excluded .= ', datepicker.min.js, placeholders.jquery.min.js';
-			$minify_excluded .= ', frontend.min.js, coupons.min.js, a11y.min.js'; // frontend.min.js is used by several add-ons.
-			$minify_excluded .= ', gpoll.min.js';
+			$js_excluded .= ', /wp-content/plugins/gravityforms/js/, /wp-content/plugins/gravityforms2checkout/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformscoupons/js/, /wp-content/plugins/gravityformsdropbox/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformsmollie/js/, /wp-content/plugins/gravityformspartialentries/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformspaypal/js/, /wp-content/plugins/gravityformsppcp/js/, /wp-content/plugins/gravityformspaypalexpresscheckout/js/, /wp-content/plugins/gravityformspaypalpro/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformspolls/js/, /wp-content/plugins/gravityformsquiz/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformssignature/js/, /wp-content/plugins/gravityformssquare/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformsstripe/js/, /wp-content/plugins/gravityformsurvey/js/';
+			$js_excluded .= ', /wp-includes/js/dist/a11y.min.js, /wp-includes/js/plupload/plupload.min.js'; // WP dependencies for GF features.
 
 			return $js_excluded;
 		}
@@ -593,9 +604,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		if ( ! defined( 'LSCWP_OBJECT_CACHE' ) ) {
 			define( 'LSCWP_OBJECT_CACHE', false );
 		}
-
-		// Autoptimize. What's the point of minifiying scripts that were excluded?
-		add_filter( 'autoptimize_filter_js_minify_excluded', '__return_false' );
 
 		// Sets the nocache headers to prevent caching by browsers and proxies respecting these headers.
 		nocache_headers();
