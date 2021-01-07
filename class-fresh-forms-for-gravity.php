@@ -116,7 +116,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$exclude_list[] = 'gform_chained_selects'; // Chained Selects Add-On.
 			$exclude_list[] = 'gsurvey_js'; // Survey Add-On.
 			$exclude_list[] = 'gpoll_js'; // Polls Add-On.
-			$exclude_list[] = 'gaddon_token.min.js'; // Credit Card Token.
+			$exclude_list[] = 'gaddon_token'; // Credit Card Token.
 
 			return $exclude_list;
 		}
@@ -192,9 +192,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 */
 		function autoptimize_exclude_gf_scripts( $js_excluded ) {
 			$js_excluded .= ', /wp-content/plugins/gravityforms/js/, /wp-content/plugins/gravityforms2checkout/js/';
-			$js_excluded .= ', /wp-content/plugins/gravityformscoupons/js/, /wp-content/plugins/gravityformsdropbox/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformscoupons/js/, /wp-content/plugins/gravityformschainedselects/js/, /wp-content/plugins/gravityformsdropbox/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformsmollie/js/, /wp-content/plugins/gravityformspartialentries/js/';
-			$js_excluded .= ', /wp-content/plugins/gravityformspaypal/js/, /wp-content/plugins/gravityformsppcp/js/, /wp-content/plugins/gravityformspaypalexpresscheckout/js/, /wp-content/plugins/gravityformspaypalpro/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformspaypal/js/, /wp-content/plugins/gravityformsppcp/js/, /wp-content/plugins/gravityformspaypalpro/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformspolls/js/, /wp-content/plugins/gravityformsquiz/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformssignature/js/, /wp-content/plugins/gravityformssquare/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformsstripe/js/, /wp-content/plugins/gravityformsurvey/js/';
