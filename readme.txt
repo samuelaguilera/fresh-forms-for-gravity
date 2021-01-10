@@ -2,7 +2,7 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.5.1
+Tested up to: 5.6
 Stable tag: 1.3
 Requires PHP: 7.0
 License: GPLv3
@@ -34,6 +34,8 @@ This plugin will take care of the above automatically doing the following:
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
 * **Ultimate Addons for Beaver Builder** Gravity Forms Styler module.
 
+If you're not using any of the above embedding methods you can still use Fresh Forms with a filter to pass the ID number of the posts where you want to run Fresh forms. Please see FAQ for more details.
+
 There's no options page, and **nothing is saved on the database**. Nothing!
 
 It should work with any caching plugin with support for DONOTCACHEPAGE constant, and proxies respecting the use Cache-Control HTTP header.
@@ -62,7 +64,7 @@ Caching plugins **NOT supported**:
 CloudFlare and other proxies:
 -----------------------------
 
-This plugin will add appropriate HTTP header to pages with a Gravity Forms to exlude the page HTML from caching when the web host setup allows it. 
+This plugin will add appropriate HTTP header to pages with a Gravity Forms form to exlude the page HTML from caching when the web host setup allows it. 
 
 By default CloudFlare doesn't cache the page HTML, it does only when you have configured it to "Cache Everything". In this case, after activating the plugin, you need to purge cache in your CloudFlare account or wait for cache expiration to let CloudFlare know the page must be excluded from caching.
 
@@ -95,7 +97,21 @@ To enable ACF support add the following line to your theme's functions.php file 
 
 `add_filter( 'freshforms_acf_support', '__return_true' );`
 
+= I want Fresh Forms to run for certain posts where I'm embedding forms using an embed method that is not supported. =
+
+Starting with Fresh Forms 1.3.1 you can use the freshforms_post_has_gform filter in your theme functions.php file or a custom fucntionatliy plugin to pass Fresh Forms the ID of the posts where you want it to run without performing the usual automatic detection of forms. Example:
+
+`add_filter( 'freshforms_post_has_gform', 'fffg_fresh_these_posts' );
+function fffg_fresh_these_posts(){
+	// Force Fresh Forms to run for posts with id 1 and 8.
+	return array( 1, 8);
+}`
+
 == Changelog ==
+
+= 1.3.1 =
+
+* Added filter freshforms_post_has_gform to force Fresh Forms to run without checking if there's a form. See FAQ for more details.
 
 = 1.3 =
 

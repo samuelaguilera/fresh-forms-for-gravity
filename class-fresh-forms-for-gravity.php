@@ -212,6 +212,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 */
 	public function check_gf( $post ) {
 
+		// Allow forcing Fresh Form run for certain post ID's without doing the checkings.
+		$post_has_gform = apply_filters( 'freshforms_post_has_gform', array() );
+		if ( ! empty( $post_has_gform ) && in_array( $post->ID, $post_has_gform, true ) ) {
+			$this->log_debug( __METHOD__ . '(): freshforms_post_has_gform filter in use.' );
+			return true;
+		}
+
 		// Check for GF shortcode.
 		if ( true === $this->find_gf_shortcode( $post->post_content ) ) {
 			return true;
@@ -312,7 +319,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 		}
 
-		// If we're here, there's no form.
+		// If we're here, no form was detected.
 		return false;
 
 	}
