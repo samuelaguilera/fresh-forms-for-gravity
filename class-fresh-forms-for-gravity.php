@@ -365,13 +365,14 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Check post content provided for Gravity Forms class.
+	 * Check HTML provided for the gform_wrapper Gravity Forms class.
 	 *
-	 * @param string $post_content      Post content.
+	 * @param string $html      HTML content for search.
 	 */
-	public function find_gform_class( $post_content ) {
+	public function find_gform_class( $html ) {
+		$this->log_debug( __METHOD__ . '(): HTML source: ' . $html );
 		// Look for the gform_wrapper.
-		if ( strpos( $post_content, 'gform_wrapper' ) !== false ) {
+		if ( strpos( $html, 'gform_wrapper' ) !== false ) {
 			// gform_wrapper found!
 			$this->log_debug( __METHOD__ . '(): gform_wrapper detected!' );
 			return true;
