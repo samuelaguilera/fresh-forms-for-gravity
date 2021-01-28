@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.6
-Stable tag: 1.3
+Stable tag: 1.3.1
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -99,12 +99,30 @@ To enable ACF support add the following line to your theme's functions.php file 
 
 = I want Fresh Forms to run for certain posts where I'm embedding forms using an embed method that is not supported. =
 
-Starting with Fresh Forms 1.3.1 you can use the freshforms_post_has_gform filter in your theme functions.php file or a custom fucntionatliy plugin to pass Fresh Forms the ID of the posts where you want it to run without performing the usual automatic detection of forms. Example:
+Starting with Fresh Forms 1.3.1 you can use the freshforms_post_has_gform filter in your theme functions.php file or a custom fucntionatliy plugin to pass Fresh Forms an array containing the ID of the posts where you want it to run without performing the usual automatic detection of forms.
+
+The following example would exclude posts with ID 1 and 8:
 
 `add_filter( 'freshforms_post_has_gform', 'fffg_fresh_these_posts' );
 function fffg_fresh_these_posts(){
 	// Force Fresh Forms to run for posts with id 1 and 8.
 	return array( 1, 8);
+}`
+
+The following example would exclude WooCommerce products using a product category with the slug product-category-1
+
+`add_filter( 'freshforms_post_has_gform', 'fffg_fresh_these_products' );
+function fffg_fresh_these_products( $post_has_form ){
+	global $post;
+
+	// Run Fresh Forms for a WooCommerce product if it has one of the following categories slugs.
+	$product_categories = array( 'product-category-1' );
+	if ( is_object( $post ) && 'product' === $post->post_type && has_term( $product_categories, 'product_cat', $post->ID ) ) {
+		return array( $post->ID );
+	}
+
+	// Otherwise.
+	return $post_has_form;
 }`
 
 == Changelog ==
