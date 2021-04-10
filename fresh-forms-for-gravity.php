@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
  * Author: Samuel Aguilera
- * Version: 1.3.1
+ * Version: 1.3.4
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.3.1' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.3.4' );
 
 add_action( 'gform_loaded', array( 'Fresh_Forms_For_Gravity_Bootstrap', 'load' ), 5 );
 register_activation_hook( __FILE__, 'fffg_purge_all_cache' );
@@ -149,10 +149,16 @@ function fffg_purge_all_cache() {
 		Hummingbird\Core\Filesystem::instance()->clean_up();
 	}
 
-	// WP Optimize.
+	// WP-Optimize.
 	if ( class_exists( 'WP_Optimize_Cache_Commands' ) ) {
 		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output to the screen.
 		$response = WP_Optimize_Cache_Commands::purge_page_cache();
+	}
+
+	// WP-Optimize minification files have a different cache.
+	if ( class_exists( 'WP_Optimize_Minify_Cache_Functions' ) ) {
+		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output to the screen.
+		$response = WP_Optimize_Minify_Cache_Functions::reset();
 	}
 
 	// Kinsta Cache.

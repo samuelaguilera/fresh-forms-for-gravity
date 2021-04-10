@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.6
-Stable tag: 1.3.1
+Tested up to: 5.7
+Stable tag: 1.3.4
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -26,15 +26,15 @@ This plugin will take care of the above automatically doing the following:
 
 * WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
 * **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
-* **Essential Addons for Elementor** Gravity Forms widget.
+* [Essential Addons for Elementor](https://wordpress.org/plugins/essential-addons-for-elementor-lite/) Gravity Forms widget.
 * **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
-* **WP Tools Gravity Forms Divi Module**.
+* [WP Tools Gravity Forms Divi Module](https://wordpress.org/plugins/wp-tools-gravity-forms-divi-module/).
 * **WooCommerce Gravity Forms Product Add-ons** by Lucas Stark.
 * **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
-* **Ultimate Addons for Beaver Builder** Gravity Forms Styler module.
+* [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 
-If you're not using any of the above embedding methods you can still use Fresh Forms with a filter to pass the ID number of the posts where you want to run Fresh forms. Please see FAQ for more details.
+If you're not using any of the above embedding methods you can still use Fresh Forms with a filter to pass the ID number of the posts where you want to run Fresh forms. You can also make Fresh Forms to add a cookie when a form is detected to use this cookie as a way to skip caching for hosts using Varnish based caching. Please see FAQ for more details.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
@@ -59,7 +59,8 @@ Caching plugins **supported**:
 Caching plugins **NOT supported**:
 ----------------------------------
 
-* Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching.
+* Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. **Check FAQ for a workaround.**
+* NitroPack. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. **Check FAQ for a workaround.**
 
 CloudFlare and other proxies:
 -----------------------------
@@ -125,7 +126,33 @@ function fffg_fresh_these_products( $post_has_form ){
 	return $post_has_form;
 }`
 
+= Is Varnish caching supported? =
+
+Fresh Forms targets only WordPress caching plugins, it doesn't communicate with your server directly. If you have a WordPress installed to manage Varnish cache and this plugin has support for the DONOTCACHEPAGE constant, Fresh Forms should work out of the box.
+
+But there are some WordPress plugins, like Breeze by CloudWays and NitroPack, that while they are created to integrate WordPress with Varnish, they don't support DONOTCACHEPAGE or provide any WordPress filters to exclude content dynamically (at the time of writing this).
+
+But both have support to exclude pages from their cache based on a cookie added. Since Fresh Forms 1.3.4, you can use the freshforms_add_cookie filter in your theme functions.php file or a custom fucntionatliy plugin to make Fresh Forms to add a cookie that you can configure in CloudWays or NitroPack account dashboard.
+
+`add_filter( 'freshforms_add_cookie', '__return_true' );`
+
+Once you have the filter added to your site, follow the instructions below.
+
+CloudWays documentation: [How to Include or Exclude Cookies From Varnish](https://support.cloudways.com/how-to-include-or-exclude-cookies-from-varnish/)
+
+Make sure you select **Exclude** for the Method, and use **FreshForms** for the cookie Value.
+
+NitroPack documentation:  [Excluded Cookies](https://support.nitropack.io/hc/en-us/articles/1500002527202-Excluded-Cookies)  
+
+Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
+
 == Changelog ==
+
+= 1.3.4 =
+
+* Added support to exclude Gravity Forms script files (and dependencies) from WP-Optimize minification/concatenation.
+* Added Fresh-Forms HTTP header.
+* Added filter freshforms_add_cookie filter that makes Fresh Forms to add a cookie that you can use with Varnish based caching plugins like CloudWays or NitroPack. See FAQ for more details.
 
 = 1.3.1 =
 

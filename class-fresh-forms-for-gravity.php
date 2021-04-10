@@ -99,7 +99,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$exclude_list[] = 'gform_masked_input';
 			$exclude_list[] = 'gform_chosen';
 			$exclude_list[] = 'gform_placeholder';
-			$exclude_list[] = 'gforms_zxcvbn';
+			$exclude_list[] = 'gforms_zxcvbn'; // Password strength.
 			$exclude_list[] = 'gf_partial_entries'; // Partial Entries Add-On.
 			$exclude_list[] = 'stripe.js'; // Stripe Add-On.
 			$exclude_list[] = 'stripe_v3';
@@ -140,6 +140,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$exclude_list[] = 'var gforms_ppcp_frontend_strings'; // PPCP Add-On.
 			$exclude_list[] = 'gform_page_loaded'; // Multi-page Ajax forms.
 			$exclude_list[] = 'var stripe'; // Stripe Checkout.
+			$exclude_list[] = 'gform_gravityforms-js-extra';
 
 			return $exclude_list;
 		}
@@ -199,6 +200,28 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$js_excluded .= ', /wp-content/plugins/gravityformssignature/js/, /wp-content/plugins/gravityformssquare/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformsstripe/js/, /wp-content/plugins/gravityformsurvey/js/';
 			$js_excluded .= ', /wp-includes/js/dist/a11y.min.js, /wp-includes/js/plupload/plupload.min.js'; // WP dependencies for GF features.
+
+			return $js_excluded;
+		}
+
+		// Add Gravity Forms scripts to WP-Optimize default exclusions.
+		add_filter( 'wp-optimize-minify-default-exclusions', 'wpo_exclude_gf_script_files', 99 ); // Lower priority to ensure it runs after any other.
+
+		/**
+		 * Exclude Gravity Forms script files from WP-Optimize minification.
+		 * No documentation available for the filter, but it seems to be valid to use any partial match for the the script path.
+		 *
+		 * @param array $js_excluded Array of scripts to exclude.
+		 */
+		function wpo_exclude_gf_script_files( $js_excluded ) {
+			$js_excluded[] = 'gravityforms'; // This should be enough to exclude any script on a folder with gravityforms as part of the name.
+			$js_excluded[] = 'jquery.min.js';
+			$js_excluded[] = 'plupload.min.js';
+			$js_excluded[] = 'a11y.min.js';
+			$js_excluded[] = 'wp-polyfill.min.js';
+			$js_excluded[] = 'dom-ready.min.js';
+			$js_excluded[] = 'i18n.min.js';
+			$js_excluded[] = 'zxcvbn.min.js'; // Password strength.
 
 			return $js_excluded;
 		}
@@ -558,7 +581,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			 * No support for DONOTCACHEPAGE and not filters available. They only allow a few cookies to exclude pages from caching.
 			 * Value is not important really, but I'm using a nonce anyway.
 			 */
-			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 0, "/$post->post_name/" );
+			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
 			$this->log_debug( __METHOD__ . "(): Cookie set for WP Engine System. Path: /$post->post_name/" );
 
 			/*
@@ -575,7 +598,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			 * They really don't want to allow you to decide which pages to exclude from their cache by your own.
 			 * That's a bad practice in my opinion. So we have only a dirty hack to avoid caching ¯\_(ツ)_/¯
 			 */
-			setcookie( 'wordpress_logged_in_' . wp_hash( 'pleasekinstaaddsupportfordonotcachepageconstant' ), 1, 0, "/$post->post_name/" );
+			setcookie( 'wordpress_logged_in_' . wp_hash( 'pleasekinstaaddsupportfordonotcachepageconstant' ), 1, 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
 			$this->log_debug( __METHOD__ . "(): Cookie set for Kinsta Cache. Path: /$post->post_name/" );
 
 			// As far as I know Kinsta doesn't forbid the use of other caching plugins. So let's Fresh Forms continue...
@@ -585,9 +608,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		// SG Optimizer cookie. This will turn off both x-cache and proxy-cache.
 		if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
 			header( 'X-Cache-Enabled: False', true );
-			setcookie( 'wpSGCacheBypass', 1, 0, "/$post->post_name/" );
+			setcookie( 'wpSGCacheBypass', 1, 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
 			$this->log_debug( __METHOD__ . "(): Cookie set for SG Optimizer. Path: /$post->post_name/" );
 		}
+
+		// Note: WP-Optimize page content minification runs on WP init so it's too late for Fresh Forms to exclue the form page using wpo_minify_run_on_page or wpo_minify_exclude_contents.
 
 		// Prevent post (currently not cached) to be cached by plugins.
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
@@ -617,6 +642,18 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		nocache_headers();
 		// Adding no-store value to Cache-Control header for additional enforcement.
 		header( 'Cache-Control: no-store', false );
+		// Adding Fresh-Forms header.
+		header( 'Fresh-Forms: enabled', false );
+
+		/**
+		 * Optionally add a custom cookie to be used with caching systems not allowing other methods to exclude pages from cache.
+		 * Requires additional setup on your caching software to recognize the cookie created.
+		 */
+		$fresh_forms_cookie = apply_filters( 'freshforms_add_cookie', false );
+		if ( true === $fresh_forms_cookie ) {
+			setcookie( 'FreshForms', 'no-cache', 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
+			$this->log_debug( __METHOD__ . "(): FreshForms Cookie added. Path: /$post->post_name/" );
+		}
 
 	}
 
