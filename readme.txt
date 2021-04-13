@@ -3,18 +3,18 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 5.7
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
 
-Automatically exclude from cache posts (any type) or pages where the content has a Gravity Forms shortcode or block. WooCommerce products and ACF are also suported.
+Automatically exclude from cache posts (any type) or pages where the content has a Gravity Forms shortcode or block. WooCommerce products and ACF are supported too. It also deals with some issues caused by automatic JS optimizations done by caching plugins.
 
 == Description ==
 
-Caching is great for scenarios where your post or page content it's not changed frequently, but if you have a form embedded to which you do changes very often or you're using dynamic code, that doesn't run for a cached page, or using third-party solutions relaying in dynamic live data (e.g. reCAPTCHA), using caching in these cases is going to cause issues.
+Caching is great for scenarios where your post or page content it's not changed frequently, but if you have a form embedded to which you do changes very often or you're using dynamic code, that doesn't run for a cached page, or using third-party solutions relaying in dynamic live data (e.g. reCAPTCHA), using caching in these cases is going to cause issues. The same applies to certain automatic JS optimizations done by caching plugins that are known to break JS execution easily.
 
-An easy solution is to configure your caching plugin or proxy to exclude the page where the form is embedded from caching, but you need also to remember this when you create a new page or embed a new form in an existing page...
+An easy solution is to configure your caching plugin or proxy to exclude the page where the form is embedded, but you need also to remember this when you create a new page or embed a new form in an existing page...
 
 This plugin will take care of the above automatically doing the following:
 
@@ -148,11 +148,12 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 
 == Changelog ==
 
-= 1.3.4 =
+= 1.3.5 =
 
-* Added support to exclude Gravity Forms script files (and dependencies) from WP-Optimize minification/concatenation.
+* Added support to prevent WP-Optimize minification breaking form pages.
 * Added Fresh-Forms HTTP header.
 * Added filter freshforms_add_cookie filter that makes Fresh Forms to add a cookie that you can use with Varnish based caching plugins like CloudWays or NitroPack. See FAQ for more details.
+* Fixed WP-Optimize cache exclusion that was broken due to WP-Optimize bad practice of using PHP_INT_MAX as priority for add_filter/add_action lines.
 
 = 1.3.1 =
 

@@ -57,6 +57,16 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			add_filter( 'wp_footer', array( $this, 'wpfc_blockCache' ) );
 		}
 
+		/**
+		 * WP-Optimize blocks any other code using WordPress core actions/filters after many of their functions by using PHP_INT_MAX as priority for their add_action/add_filter lines.
+		 * This also completely invalidates most of the filters WP-Optimize provides to make cache/minify exclusions if you need to use the same WordPress core filters.
+		 * ¯\_(ツ)_/¯
+		 */
+		if ( class_exists( 'WP_Optimize' ) ) {
+			// Using this filter to avoid WP-Optimize invalidating the use of its filters when using template_redirect due to bad use of PHP_INT_MAX for add_filter.
+			add_filter( 'wp_default_scripts', array( $this, 'wpo_no_cache_minify' ) );
+		}
+
 		// I could check for the CloudFlare plugin, but many people is using CloudFlare without having the plugin installed.
 		add_filter( 'script_loader_tag', 'rocket_loader_exclude_gf_scripts', 10, 3 );
 
@@ -182,9 +192,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		// Autoptimize. What's the point of minifiying scripts that were excluded?
-		add_filter( 'autoptimize_filter_js_minify_excluded', '__return_false', 99 ); // Lower priority to ensure it runs after any other.
+		add_filter( 'autoptimize_filter_js_minify_excluded', '__return_false', 99 ); // Lower priority to ensure it runs later than default.
 		// Add Gravity Forms scripts to the excluded JS list.
-		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts', 99 ); // Lower priority to ensure it runs after any other.
+		add_filter( 'autoptimize_filter_js_exclude', 'autoptimize_exclude_gf_scripts', 99 ); // Lower priority to ensure it runs later than default.
 
 		/**
 		 * Exclude Gravity Forms scripts from Autoptimize.
@@ -205,7 +215,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		// Add Gravity Forms scripts to WP-Optimize default exclusions.
-		add_filter( 'wp-optimize-minify-default-exclusions', 'wpo_exclude_gf_script_files', 99 ); // Lower priority to ensure it runs after any other.
+		add_filter( 'wp-optimize-minify-default-exclusions', 'wpo_exclude_gf_script_files', 99 ); // Lower priority to ensure it runs later than default.
 
 		/**
 		 * Exclude Gravity Forms script files from WP-Optimize minification.
@@ -612,8 +622,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$this->log_debug( __METHOD__ . "(): Cookie set for SG Optimizer. Path: /$post->post_name/" );
 		}
 
-		// Note: WP-Optimize page content minification runs on WP init so it's too late for Fresh Forms to exclue the form page using wpo_minify_run_on_page or wpo_minify_exclude_contents.
-
 		// Prevent post (currently not cached) to be cached by plugins.
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
@@ -676,6 +684,34 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		echo '<!-- [wpfcNOT] -->';
 		$this->log_debug( __METHOD__ . '(): Added [wpfcNOT] for WP Fastest Cache.' );
+	}
+
+	/**
+	 *  Prevent WP-Optimize cache and minification when a form is found.
+	 */
+	public function wpo_no_cache_minify() {
+
+		global $post;
+
+		// Running only for posts (any type) and pages.
+		if ( ! is_single() && ! is_page() ) {
+			return;
+		}
+
+		// No shortcode and no block? Do nothing.
+		if ( false === $this->maybe_no_cache( $post->ID ) ) {
+			return;
+		}
+
+		// Exclude form page form cache.
+		add_filter( 'wpo_can_cache_page', '__return_false', 99 ); // Lower priority to ensure it runs later than default.
+		/**
+		 * WP-Optimize exclude minification of the form page.
+		 * The developer doesn't provide documentation for the filter, but the function where it's applied is also used to exclude WooCommerce Checkout.
+		 * So it seems like the right one to exclude other forms.
+		 */
+		add_filter( 'wpo_minify_exclude_contents', '__return_true', 99 ); // Lower priority to ensure it runs later than default.
+
 	}
 
 }
