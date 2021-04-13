@@ -126,6 +126,8 @@ function fffg_fresh_these_products( $post_has_form ){
 	return $post_has_form;
 }`
 
+After doing the above, you need to **flush your host/plugin and browser cache**.
+
 = Is Varnish caching supported? =
 
 Fresh Forms targets only WordPress caching plugins, it doesn't communicate with your server directly. If you have a WordPress installed to manage Varnish cache and this plugin has support for the DONOTCACHEPAGE constant, Fresh Forms should work out of the box.
@@ -145,6 +147,8 @@ Make sure you select **Exclude** for the Method, and use **FreshForms** for the 
 NitroPack documentation:  [Excluded Cookies](https://support.nitropack.io/hc/en-us/articles/1500002527202-Excluded-Cookies)  
 
 Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
+
+After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
 
