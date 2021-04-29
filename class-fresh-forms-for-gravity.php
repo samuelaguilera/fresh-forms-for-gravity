@@ -67,8 +67,17 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			add_filter( 'wp_default_scripts', array( $this, 'wpo_no_cache_minify' ) );
 		}
 
+		/*
+		 * Endurance Page Cache.
+		 * NOTE: X-Endurance-Cache-Level header is set by .htacces rule, so it doesn't necessarily represents the current caching level.
+		 * Need more testing to confirm if Endurance Page Cache is really allowing us to exclude the page with this UNDOCUMENTED filter.
+		 */
+		if ( class_exists( 'Endurance_Page_Cache' ) ) {
+			add_filter( 'init', array( $this, 'epc_no_cache' ) ); // EPC runs start() function on init.
+		}
+
 		// I could check for the CloudFlare plugin, but many people is using CloudFlare without having the plugin installed.
-		add_filter( 'script_loader_tag', 'rocket_loader_exclude_gf_scripts', 10, 3 );
+		add_filter( 'script_loader_tag', 'rocket_loader_exclude_gf_scripts', 99, 3 );
 
 		/**
 		 * Exclude Gravity Forms scripts from Rocket Loader minification. All Gravity Forms scripts are already minified.
@@ -78,11 +87,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param string $src    The script's source URL.
 		 */
 		function rocket_loader_exclude_gf_scripts( $tag, $handle, $src ) {
-			if ( strpos( $handle, 'gform' ) !== false || 'plupload-all' === $handle ) {
-				return str_replace( "src='", "data-cfasync='false' src='", $tag );
-			} else {
-				return $tag;
+			global $fffg_js_handlers;
+			if ( in_array( $handle, $fffg_js_handlers, true ) ) {
+				// Prevent issues with CloudFlare Rocket Loader.
+				$tag = str_replace( "src='", "data-cfasync='false' src='", $tag );
 			}
+			return $tag;
 		}
 
 		// All Gravity Forms scripts are already minified.
@@ -98,35 +108,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $exclude_list List of script handlers to exclude.
 		 */
 		function sgo_exclude_gf_scripts( $exclude_list ) {
+			global $fffg_js_handlers;
 
-			$exclude_list[] = 'jquery'; // Yeah, not a GF script but many of them (and themes, and etc...) have it as dependency.
-			$exclude_list[] = 'gform_gravityforms';
-			$exclude_list[] = 'gform_conditional_logic';
-			$exclude_list[] = 'gform_datepicker_init';
-			$exclude_list[] = 'plupload-all';
-			$exclude_list[] = 'gform_json';
-			$exclude_list[] = 'gform_textarea_counter';
-			$exclude_list[] = 'gform_masked_input';
-			$exclude_list[] = 'gform_chosen';
-			$exclude_list[] = 'gform_placeholder';
-			$exclude_list[] = 'gforms_zxcvbn'; // Password strength.
-			$exclude_list[] = 'gf_partial_entries'; // Partial Entries Add-On.
-			$exclude_list[] = 'stripe.js'; // Stripe Add-On.
-			$exclude_list[] = 'stripe_v3';
-			$exclude_list[] = 'gforms_stripe_frontend';
-			$exclude_list[] = 'gform_coupon_script'; // Coupons Add-On.
-			$exclude_list[] = 'gforms_ppcp_frontend'; // PPCP Add-On.
-			$exclude_list[] = 'gform_paypal_sdk'; // Dependency for PPCP.
-			$exclude_list[] = 'wp-a11y'; // Dependency for PPCP. This and the following three lines fixed issues with a PPCP form.
-			$exclude_list[] = 'wp-dom-ready'; // Dependency for wp-a11y.
-			$exclude_list[] = 'wp-polyfill'; // Dependency for wp-a11y.
-			$exclude_list[] = 'wp-i18n'; // Dependency for wp-a11y.
-			$exclude_list[] = 'gforms_square_frontend'; // Square Add-On.
-			$exclude_list[] = 'gform_mollie_components'; // Mollie Add-On.
-			$exclude_list[] = 'gform_chained_selects'; // Chained Selects Add-On.
-			$exclude_list[] = 'gsurvey_js'; // Survey Add-On.
-			$exclude_list[] = 'gpoll_js'; // Polls Add-On.
-			$exclude_list[] = 'gaddon_token'; // Credit Card Token.
+			$exclude_list = array_merge( $exclude_list, $fffg_js_handlers );
 
 			return $exclude_list;
 		}
@@ -137,22 +121,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		/**
 		 * Exclude Gravity Forms inline scripts from SGO "Combine JavaScript Files" feature.
 		 *
-		 * @param array $exclude_list First few symbols of inline content script.
+		 * @param array $js_excluded First few symbols of inline content script.
 		 */
-		function sgo_exclude_inline_gf_scripts( $exclude_list ) {
-			$exclude_list[] = 'gformRedirect';
-			$exclude_list[] = 'var gf_global';
-			$exclude_list[] = 'gformInitSpinner';
-			$exclude_list[] = 'var gf_partial_entries';
-			$exclude_list[] = '(function(d,s,i,r)'; // HubSpot Tracking Script.
-			$exclude_list[] = 'gform.addAction';
-			$exclude_list[] = 'gform_post_render';
-			$exclude_list[] = 'var gforms_ppcp_frontend_strings'; // PPCP Add-On.
-			$exclude_list[] = 'gform_page_loaded'; // Multi-page Ajax forms.
-			$exclude_list[] = 'var stripe'; // Stripe Checkout.
-			$exclude_list[] = 'gform_gravityforms-js-extra';
-
-			return $exclude_list;
+		function sgo_exclude_inline_gf_scripts( $js_excluded ) {
+			global $fffg_js_inline_partial;
+			$js_excluded = array_merge( $js_excluded, $fffg_js_inline_partial );
+			GFCommon::log_debug( __METHOD__ . '(): SG Optimizer Exclude Inline JS => ' . print_r( $js_excluded, true ) );
+			return $js_excluded;
 		}
 
 		// This fixes a "contains errors" issue with the Signature page.
@@ -176,19 +151,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		/**
 		 * Exclude sensitive external scripts sources from SGO "Combine JavaScript Files" feature.
 		 *
-		 * @param array $exclude_list Domains that you want to exclude.
+		 * @param array $js_excluded Domains for external JS that you want to exclude.
 		 */
-		function sgo_exclude_js_combine_external_scripts( $exclude_list ) {
-			$exclude_list[] = '2checkout.com';
-			$exclude_list[] = 'agilecrm.com';
-			$exclude_list[] = 'dropbox.com';
-			$exclude_list[] = 'js.hs-analytics.net'; // HubSpot Analytics Code.
-			$exclude_list[] = 'mollie.com';
-			$exclude_list[] = 'paypal.com';
-			$exclude_list[] = 'square.com';
-			$exclude_list[] = 'stripe.com';
-
-			return $exclude_list;
+		function sgo_exclude_js_combine_external_scripts( $js_excluded ) {
+			global $fffg_js_external_domain;
+			$js_excluded = array_merge( $js_excluded, $fffg_js_external_domain );
+			return $js_excluded;
 		}
 
 		// Autoptimize. What's the point of minifiying scripts that were excluded?
@@ -208,7 +176,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$js_excluded .= ', /wp-content/plugins/gravityformspaypal/js/, /wp-content/plugins/gravityformsppcp/js/, /wp-content/plugins/gravityformspaypalpro/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformspolls/js/, /wp-content/plugins/gravityformsquiz/js/';
 			$js_excluded .= ', /wp-content/plugins/gravityformssignature/js/, /wp-content/plugins/gravityformssquare/js/';
-			$js_excluded .= ', /wp-content/plugins/gravityformsstripe/js/, /wp-content/plugins/gravityformsurvey/js/';
+			$js_excluded .= ', /wp-content/plugins/gravityformsstripe/js/, /wp-content/plugins/gravityformsurvey/js/, /wp-content/plugins/gravityformssignature/includes/super_signature/';
 			$js_excluded .= ', /wp-includes/js/dist/a11y.min.js, /wp-includes/js/plupload/plupload.min.js'; // WP dependencies for GF features.
 
 			return $js_excluded;
@@ -224,15 +192,87 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded Array of scripts to exclude.
 		 */
 		function wpo_exclude_gf_script_files( $js_excluded ) {
-			$js_excluded[] = 'gravityforms'; // This should be enough to exclude any script on a folder with gravityforms as part of the name.
-			$js_excluded[] = 'jquery.min.js';
-			$js_excluded[] = 'plupload.min.js';
-			$js_excluded[] = 'a11y.min.js';
-			$js_excluded[] = 'wp-polyfill.min.js';
-			$js_excluded[] = 'dom-ready.min.js';
-			$js_excluded[] = 'i18n.min.js';
-			$js_excluded[] = 'zxcvbn.min.js'; // Password strength.
+			global $fffg_js_partial;
+			$js_excluded = array_merge( $js_excluded, $fffg_js_partial );
+			GFCommon::log_debug( __METHOD__ . '(): WP-Optimize Minify JS Exclusions => ' . print_r( $js_excluded, true ) );
+			return $js_excluded;
+		}
 
+		add_filter( 'wphb_minify_resource', 'wphb_exclude_gravity_scripts', 99, 3 );
+		add_filter( 'wphb_combine_resource', 'wphb_exclude_gravity_scripts', 99, 3 );
+		add_filter( 'wphb_minification_display_enqueued_file', 'wphb_exclude_gravity_scripts', 99, 3 );
+		/**
+		 * Exclude Gravity Forms script files from Hummingbird minification.
+		 * No documentation available for the filters.
+		 *
+		 * @param bool   $action False to exclude the script.
+		 * @param string $handle Handle registered for the resource.
+		 * @param string $type   scripts or styles.
+		 */
+		function wphb_exclude_gravity_scripts( $action, $handle, $type ) {
+			global $fffg_js_handlers;
+
+			if ( is_array( $handle ) && isset( $handle['handle'] ) ) {
+				$handle = $handle['handle'];
+			}
+
+			if ( 'scripts' === $type && in_array( $handle, $fffg_js_handlers, true ) ) {
+				return false;
+			}
+
+			return $action;
+		}
+
+		// Add Gravity Forms scripts to WP Rocket defer JS exclude list.
+		add_filter( 'rocket_exclude_defer_js', 'wprocket_exclude_gf_defer_js', 99 ); // Lower priority to ensure it runs later than default.
+
+		/**
+		 * Exclude Gravity Forms script files from WP Rocket defer.
+		 * Documentation: https://docs.wp-rocket.me/article/976-exclude-files-from-defer-js .
+		 *
+		 * @param array $js_excluded Array of scripts to returned by WP Rocket.
+		 */
+		function wprocket_exclude_gf_defer_js( $js_excluded ) {
+			global $fffg_js_partial;
+			$js_excluded = array_merge( $js_excluded, $fffg_js_partial );
+			GFCommon::log_debug( __METHOD__ . '(): WP Rocket Exclude Defer JS => ' . print_r( $js_excluded, true ) );
+			return $js_excluded;
+		}
+
+		// Add Gravity Forms scripts to WP Rocket excluded inline JS combining list.
+		add_filter( 'rocket_excluded_inline_js_content', 'wprocket_exclude_gf_inline_js', 99 ); // Lower priority to ensure it runs later than default.
+
+		/**
+		 * Exclude Gravity Forms script files from WP Rocket inline JS combining.
+		 * No documentation for the filter, but according to this https://docs.wp-rocket.me/article/1104-excluding-inline-js-from-combine it will accept any string of the script, like SG Optimizer does.
+		 *
+		 * @param array $js_excluded Array of scripts to returned by WP Rocket.
+		 */
+		function wprocket_exclude_gf_inline_js( $js_excluded ) {
+			global $fffg_js_inline_partial;
+			$js_excluded = array_merge( $js_excluded, $fffg_js_inline_partial );
+			GFCommon::log_debug( __METHOD__ . '(): WP Rocket Exclude Combine Inline JS => ' . print_r( $js_excluded, true ) );
+			return $js_excluded;
+		}
+
+		// Add Gravity Forms scripts to WP Rocket files minification/concatenation exclude list.
+		add_filter( 'rocket_exclude_js', 'wprocket_exclude_gf_js', 99 ); // Lower priority to ensure it runs later than default.
+
+		/**
+		 * Exclude Gravity Forms script files from WP Rocket minification/concatenation.
+		 * Documentation: https://docs.wp-rocket.me/article/39-excluding-external-js-from-concatenation .
+		 *
+		 * @param array $js_excluded Array of scripts to returned by WP Rocket.
+		 */
+		function wprocket_exclude_gf_js( $js_excluded ) {
+			global $fffg_js_external_domain;
+			// External domains.
+			$js_excluded = array_merge( $js_excluded, $fffg_js_external_domain );
+			// Local paths.
+			$js_excluded[] = '/wp-content/plugins/gravityforms*'; // This is enough to match any script having gravityforms as part of the URL.
+			$js_excluded[] = '/wp-includes/js/dist/a11y.min.js';
+			$js_excluded[] = '/wp-includes/js/plupload/plupload.min.js';
+			GFCommon::log_debug( __METHOD__ . '(): WP Rocket JS Minification/Concatenation => ' . print_r( $js_excluded, true ) );
 			return $js_excluded;
 		}
 
@@ -651,7 +691,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		// Adding no-store value to Cache-Control header for additional enforcement.
 		header( 'Cache-Control: no-store', false );
 		// Adding Fresh-Forms header.
-		header( 'Fresh-Forms: enabled', false );
+		header( 'Fresh-Forms: ' . FRESH_FORMS_FOR_GRAVITY_VERSION, false );
 
 		/**
 		 * Optionally add a custom cookie to be used with caching systems not allowing other methods to exclude pages from cache.
@@ -707,11 +747,33 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		add_filter( 'wpo_can_cache_page', '__return_false', 99 ); // Lower priority to ensure it runs later than default.
 		/**
 		 * WP-Optimize exclude minification of the form page.
-		 * The developer doesn't provide documentation for the filter, but the function where it's applied is also used to exclude WooCommerce Checkout.
+		 * The developer doesn't provide documentation for the filters, but the function where it's applied is also used to exclude WooCommerce Checkout.
 		 * So it seems like the right one to exclude other forms.
 		 */
 		add_filter( 'wpo_minify_exclude_contents', '__return_true', 99 ); // Lower priority to ensure it runs later than default.
+		add_filter( 'wpo_minify_run_on_page', '__return_true', 99 ); // Lower priority to ensure it runs later than default.
 
+	}
+
+	/**
+	 *  Prevent Endurance Page Cache.
+	 */
+	public function epc_no_cache() {
+
+		global $post;
+
+		// Running only for posts (any type) and pages.
+		if ( ! is_single() && ! is_page() ) {
+			return;
+		}
+
+		// No shortcode and no block? Do nothing.
+		if ( false === $this->maybe_no_cache( $post->ID ) ) {
+			return;
+		}
+
+		// At this point we have a form.
+		add_filter( 'epc_is_cachable', '__return_false', 99 );
 	}
 
 }

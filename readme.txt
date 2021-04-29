@@ -2,13 +2,13 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.7
-Stable tag: 1.3.5
+Tested up to: 5.7.1
+Stable tag: 1.3.12
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
 
-Automatically exclude from cache posts (any type) or pages where the content has a Gravity Forms shortcode or block. WooCommerce products and ACF are supported too. It also deals with some issues caused by automatic JS optimizations done by caching plugins.
+Automatically exclude from cache posts (any type) or pages where the content has a Gravity Forms shortcode or block. WooCommerce products and ACF are supported too. It also deals with some issues caused by automatic JS optimizations done by some caching plugins.
 
 == Description ==
 
@@ -36,7 +36,7 @@ This plugin will take care of the above automatically doing the following:
 
 If you're not using any of the above embedding methods you can still use Fresh Forms with a filter to pass the ID number of the posts where you want to run Fresh forms. You can also make Fresh Forms to add a cookie when a form is detected to use this cookie as a way to skip caching for hosts using Varnish based caching. Please see FAQ for more details.
 
-There's no options page, and **nothing is saved on the database**. Nothing!
+There's no options page. Only the plugin version is saved to the database to be able to handle actions after an update when needed, **no other data is stored**.
 
 It should work with any caching plugin with support for DONOTCACHEPAGE constant, and proxies respecting the use Cache-Control HTTP header.
 
@@ -151,6 +151,16 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.3.12 =
+
+* Added support to prevent issues with Hummingbird Asset Optimization breaking JS based features.
+* Added support to prevent issues with WP Rocket Defer JS, Minification/Combination of files and Combine Inline JS features breaking JS based features.
+* Added experimental support for Bluehost's Endurance Page Cache.
+* Added missing path for SuperSignature scripts to Autoptimize exclusions.
+* Added automatic flush of cache after Fresh Forms updates to allow new additions to take effect transparently. Known issue: WP-Optimize requires a manual purge from its settings page.
+* Changed the value of the Fresh-Forms HTTP header to use the version number.
+* Improved CloudFlare's Rocket Loader exclusions.
 
 = 1.3.5 =
 
