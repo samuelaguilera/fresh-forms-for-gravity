@@ -152,6 +152,11 @@ After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
 
+= 1.3.14 =
+
+* Added support to exclude pages with a form from W3TC minify JS feature (files and inline). W3TC minifies inline JS as part of the HTML minify, so this affects also to HTML minification for form pages.
+* Added gform.initializeOnLoaded to the list of inline scripts string matches. Thanks to Richard Wawrzyniak for pointing it.
+
 = 1.3.12 =
 
 * Added support to prevent issues with Hummingbird Asset Optimization breaking JS based features.

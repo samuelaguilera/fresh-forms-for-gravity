@@ -126,7 +126,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		function sgo_exclude_inline_gf_scripts( $js_excluded ) {
 			global $fffg_js_inline_partial;
 			$js_excluded = array_merge( $js_excluded, $fffg_js_inline_partial );
-			GFCommon::log_debug( __METHOD__ . '(): SG Optimizer Exclude Inline JS => ' . print_r( $js_excluded, true ) );
 			return $js_excluded;
 		}
 
@@ -194,7 +193,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		function wpo_exclude_gf_script_files( $js_excluded ) {
 			global $fffg_js_partial;
 			$js_excluded = array_merge( $js_excluded, $fffg_js_partial );
-			GFCommon::log_debug( __METHOD__ . '(): WP-Optimize Minify JS Exclusions => ' . print_r( $js_excluded, true ) );
 			return $js_excluded;
 		}
 
@@ -235,7 +233,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		function wprocket_exclude_gf_defer_js( $js_excluded ) {
 			global $fffg_js_partial;
 			$js_excluded = array_merge( $js_excluded, $fffg_js_partial );
-			GFCommon::log_debug( __METHOD__ . '(): WP Rocket Exclude Defer JS => ' . print_r( $js_excluded, true ) );
 			return $js_excluded;
 		}
 
@@ -251,7 +248,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		function wprocket_exclude_gf_inline_js( $js_excluded ) {
 			global $fffg_js_inline_partial;
 			$js_excluded = array_merge( $js_excluded, $fffg_js_inline_partial );
-			GFCommon::log_debug( __METHOD__ . '(): WP Rocket Exclude Combine Inline JS => ' . print_r( $js_excluded, true ) );
 			return $js_excluded;
 		}
 
@@ -272,7 +268,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$js_excluded[] = '/wp-content/plugins/gravityforms*'; // This is enough to match any script having gravityforms as part of the URL.
 			$js_excluded[] = '/wp-includes/js/dist/a11y.min.js';
 			$js_excluded[] = '/wp-includes/js/plupload/plupload.min.js';
-			GFCommon::log_debug( __METHOD__ . '(): WP Rocket JS Minification/Concatenation => ' . print_r( $js_excluded, true ) );
 			return $js_excluded;
 		}
 
@@ -662,6 +657,16 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$this->log_debug( __METHOD__ . "(): Cookie set for SG Optimizer. Path: /$post->post_name/" );
 		}
 
+		// W3TC. Another plugin without documentation for the filters. As far as I know there are no filters to exclude per handler, path to file, etc.
+		if ( class_exists( 'W3TC\Minify_Plugin' ) ) {
+			add_filter( 'w3tc_minify_js_enable', '__return_false', 99 );
+			add_filter( 'w3tc_minify_html_enable', '__return_false', 99 ); // This includes inline JS minify.
+		}
+		// W3TC has support for DONOTCACHEPAGE, but just in case something else could be changing DONOTCACHEPAGE value after FF.
+		if ( class_exists( 'W3TC\PgCache_ContentGrabber' ) ) {
+			add_filter( 'w3tc_can_cache', '__return_false', 99 );
+		}
+
 		// Prevent post (currently not cached) to be cached by plugins.
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
@@ -690,7 +695,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		nocache_headers();
 		// Adding no-store value to Cache-Control header for additional enforcement.
 		header( 'Cache-Control: no-store', false );
-		// Adding Fresh-Forms header.
+		// Adding Fresh-Forms header. Reminder: WPE doesn't support doing modifications to the HTTP headers, so this will not work for WPE hosted sites.
 		header( 'Fresh-Forms: ' . FRESH_FORMS_FOR_GRAVITY_VERSION, false );
 
 		/**
