@@ -228,7 +228,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * Exclude Gravity Forms script files from WP Rocket defer.
 		 * Documentation: https://docs.wp-rocket.me/article/976-exclude-files-from-defer-js .
 		 *
-		 * @param array $js_excluded Array of scripts to returned by WP Rocket.
+		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
 		function wprocket_exclude_gf_defer_js( $js_excluded ) {
 			global $fffg_js_partial;
@@ -243,7 +243,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * Exclude Gravity Forms script files from WP Rocket inline JS combining.
 		 * No documentation for the filter, but according to this https://docs.wp-rocket.me/article/1104-excluding-inline-js-from-combine it will accept any string of the script, like SG Optimizer does.
 		 *
-		 * @param array $js_excluded Array of scripts to returned by WP Rocket.
+		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
 		function wprocket_exclude_gf_inline_js( $js_excluded ) {
 			global $fffg_js_inline_partial;
@@ -258,7 +258,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * Exclude Gravity Forms script files from WP Rocket minification/concatenation.
 		 * Documentation: https://docs.wp-rocket.me/article/39-excluding-external-js-from-concatenation .
 		 *
-		 * @param array $js_excluded Array of scripts to returned by WP Rocket.
+		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
 		function wprocket_exclude_gf_js( $js_excluded ) {
 			global $fffg_js_external_domain;
@@ -682,13 +682,9 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			define( 'DONOTCACHEDB', true );
 		}
 
-		// LiteSpeed Page Cache.
-		if ( ! defined( 'LSCACHE_NO_CACHE' ) ) {
-			define( 'LSCACHE_NO_CACHE', true );
-		}
-		// LiteSpeed Object Cache.
-		if ( ! defined( 'LSCWP_OBJECT_CACHE' ) ) {
-			define( 'LSCWP_OBJECT_CACHE', false );
+		// LiteSpeed Cache plugin.
+		if ( ! defined( 'LITESPEED_DISABLE_ALL' ) ) {
+			define( 'LITESPEED_DISABLE_ALL', true );
 		}
 
 		// Sets the nocache headers to prevent caching by browsers and proxies respecting these headers.
