@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
  * Author: Samuel Aguilera
- * Version: 1.3.15
+ * Version: 1.3.16
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.3.15' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.3.16' );
 
 // Scripts handlers for plugins using them for exclusion filters (e.g. SG Optimizer or Hummingbird).
 $fffg_js_handlers = array(
@@ -231,13 +231,13 @@ function fffg_purge_all_cache() {
 
 	// WP-Optimize.
 	if ( class_exists( 'WP_Optimize_Cache_Commands' ) ) {
-		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output to the screen.
+		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output.
 		$response = WP_Optimize_Cache_Commands::purge_page_cache();
 	}
 
 	// WP-Optimize minification files have a different cache.
 	if ( class_exists( 'WP_Optimize_Minify_Cache_Functions' ) ) {
-		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output to the screen.
+		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output.
 		$response = WP_Optimize_Minify_Cache_Functions::purge();
 	}
 
@@ -251,6 +251,12 @@ function fffg_purge_all_cache() {
 	if ( class_exists( 'Endurance_Page_Cache' ) && is_object( $epc ) ) {
 		// $epc object already created by endurance-page-cache.php file.
 		$epc->purge_all();
+	}
+
+	// Pantheon Cache. Documentation points to a different function, but seems outdated, as it doesn't exist in the current plugin files at GitHub.
+	if ( function_exists( 'pantheon_wp_clear_edge_all' ) ) {
+		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output.
+		$response = pantheon_wp_clear_edge_all();
 	}
 }
 

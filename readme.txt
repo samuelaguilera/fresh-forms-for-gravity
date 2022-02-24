@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 5.7.2
-Stable tag: 1.3.15
+Tested up to: 5.9.1
+Stable tag: 1.3.16
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,6 +25,7 @@ This plugin will take care of the above automatically doing the following:
 = Embedding methods supported: =
 
 * WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
+* **Avada**. The following elements has been proven to work: Content Boxes, "Gravity Form", Modal, Text Block. Other Avada elements could work too, but not tested.
 * **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
 * [Essential Addons for Elementor](https://wordpress.org/plugins/essential-addons-for-elementor-lite/) Gravity Forms widget.
 * **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
@@ -48,7 +49,7 @@ Caching plugins **supported**:
 * Hummingbird
 * Kinsta Cache
 * LiteSpeed Cache
-* SG Optimizer
+* SiteGround Optimizer
 * W3 Total Cache
 * WP Engine System
 * WP Fastest Cache
@@ -151,6 +152,10 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.3.16 =
+
+* Added support for Pantheon Cache cleaning on plugin activation. According to Pantheon Cache documentation cache exclusion is based on the Cache-Control header, which Fresh Forms already adds, so clearing cache should enable cache exclusion. https://pantheon.io/docs/cache-control
 
 = 1.3.15 =
 
