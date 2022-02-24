@@ -15,14 +15,15 @@ Embedding methods supported:
 ---------------------------------------------------------------------
 
 * WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
+* **Avada**. The following elements has been proven to work: Content Boxes, "Gravity Form", Modal, Text Block. Other Avada elements could work too, but not tested.
 * **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
-* **Essential Addons for Elementor** Gravity Forms widget.
+* [Essential Addons for Elementor](https://wordpress.org/plugins/essential-addons-for-elementor-lite/) Gravity Forms widget.
 * **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
-* **WP Tools Gravity Forms Divi Module**.
+* [WP Tools Gravity Forms Divi Module](https://wordpress.org/plugins/wp-tools-gravity-forms-divi-module/).
 * **WooCommerce Gravity Forms Product Add-ons** by Lucas Stark.
 * **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
-* **Ultimate Addons for Beaver Builder** Gravity Forms Styler module.
+* [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
@@ -36,7 +37,7 @@ Caching plugins **supported**:
 * Hummingbird
 * Kinsta Cache
 * LiteSpeed Cache
-* SG Optimizer
+* SiteGround Optimizer
 * W3 Total Cache
 * WP Engine System
 * WP Fastest Cache
@@ -47,7 +48,8 @@ Caching plugins **supported**:
 Caching plugins **NOT supported**:
 ----------------------------------
 
-* Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching.
+* Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. [**Check FAQ for a workaround.**](https://wordpress.org/plugins/fresh-forms-for-gravity/#is%20varnish%20caching%20supported%3F)
+* NitroPack. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. [**Check FAQ for a workaround.**](https://wordpress.org/plugins/fresh-forms-for-gravity/#is%20varnish%20caching%20supported%3F)
 
 CloudFlare and other proxies:
 -----------------------------
