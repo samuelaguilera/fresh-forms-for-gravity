@@ -88,7 +88,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 */
 		function rocket_loader_exclude_gf_scripts( $tag, $handle, $src ) {
 			global $fffg_js_handlers;
-			if ( in_array( $handle, $fffg_js_handlers, true ) ) {
+			if ( is_array( $fffg_js_handlers ) && in_array( $handle, $fffg_js_handlers, true ) ) {
 				// Prevent issues with CloudFlare Rocket Loader.
 				$tag = str_replace( "src='", "data-cfasync='false' src='", $tag );
 			}
@@ -214,7 +214,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 				$handle = $handle['handle'];
 			}
 
-			if ( 'scripts' === $type && in_array( $handle, $fffg_js_handlers, true ) ) {
+			if ( 'scripts' === $type && is_array( $fffg_js_handlers ) && in_array( $handle, $fffg_js_handlers, true ) ) {
 				return false;
 			}
 
