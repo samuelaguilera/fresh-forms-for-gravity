@@ -34,11 +34,13 @@ Caching plugins **supported**:
 ---------------------------------------------------------------------
 
 * Autoptimize
+* Cache Enabler
 * Comet Cache
 * Hummingbird
 * Kinsta Cache
 * LiteSpeed Cache
 * SiteGround Optimizer
+* Surge
 * W3 Total Cache
 * WP Engine System
 * WP Fastest Cache

@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
 Tested up to: 6.0
-Stable tag: 1.3.17
+Stable tag: 1.3.19
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -46,11 +46,13 @@ Caching plugins **supported**:
 ---------------------------------------------------------------------
 
 * Autoptimize
+* Cache Enabler
 * Comet Cache
 * Hummingbird
 * Kinsta Cache
 * LiteSpeed Cache
 * SiteGround Optimizer
+* Surge
 * W3 Total Cache
 * WP Engine System
 * WP Fastest Cache
@@ -154,9 +156,11 @@ After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
 
-= 1.3.17 =
+= 1.3.19 =
 
 * Fixed array warning when `wp doctor check autoload-options-size` is used. Thanks to @bozzmedia for the report.
+* Added Surge to the list of supported caching plugin. It supports Cache-Control: no-cache header.
+* Added Cache Enabler to the list of supported caching plugin. It supports DONOTCACHEPAGE constant.
 
 = 1.3.16 =
 
