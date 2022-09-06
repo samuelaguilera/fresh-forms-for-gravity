@@ -444,7 +444,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Check the HTML provided for the gform_wrapper Gravity Forms class.
+	 * Search for the value provided inside the HTML passed.
 	 *
 	 * @param string $html      HTML content for searching.
 	 * @param string $value     The value to search.
