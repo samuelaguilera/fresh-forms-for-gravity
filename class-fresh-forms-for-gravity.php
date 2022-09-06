@@ -387,6 +387,17 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 		}
 
+		// Check for Ultimate Addons for Elementor By Brainstorm Force.
+		if ( class_exists( 'UAEL_Loader' ) && $this->scan_post_content( $post->post_content, 'gform_hidden' ) ) {
+			/*
+			 * UAEL is replacing the default form wrapper with its own, so checking for gform_wrapper is not possible.
+			 * They add their stuff on the fly, it's not saved in the post content, so we can't check for it either.
+			 * Checking for gform_hidden instead as the form has always some hidden inputs.
+			*/
+			$this->log_debug( __METHOD__ . '(): Ultimate Addons for Elementor!' );
+			return true;
+		}
+
 		// If we're here, no form was detected.
 		return false;
 
@@ -433,16 +444,17 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Check HTML provided for the gform_wrapper Gravity Forms class.
+	 * Check the HTML provided for the gform_wrapper Gravity Forms class.
 	 *
-	 * @param string $html      HTML content for search.
+	 * @param string $html      HTML content for searching.
+	 * @param string $value     The value to search.
 	 */
-	public function find_gform_class( $html ) {
+	public function scan_post_content( $html, $value ) {
 		$this->log_debug( __METHOD__ . '(): HTML source: ' . $html );
 		// Look for the gform_wrapper.
-		if ( strpos( $html, 'gform_wrapper' ) !== false ) {
-			// gform_wrapper found!
-			$this->log_debug( __METHOD__ . '(): gform_wrapper detected!' );
+		if ( strpos( $html, $value ) !== false ) {
+			// Class found!
+			$this->log_debug( __METHOD__ . "(): {$value} detected in post content." );
 			return true;
 		}
 		// If we're here, there's no GF form class.
@@ -464,12 +476,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 
 			if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) { // Look for a GF shortcode inside a standalone text or textarea fields.
-				if ( true === $this->find_gf_shortcode( $acf_field['value'] ) ) {
+				if ( true === $this->find_gf_shortcode( $acf_field['value'], 'gform_wrapper' ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 					return true;
 				}
 			} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
-				if ( true === $this->find_gform_class( $acf_field['value'] ) ) {
+				if ( true === $this->scan_post_content( $acf_field['value'], 'gform_wrapper' ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 					return true;
 				}
@@ -480,7 +492,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 						if ( true === $this->find_gf_shortcode( $value ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 							return true;
-						} elseif ( true === $this->find_gform_class( $value ) ) {
+						} elseif ( true === $this->scan_post_content( $value, 'gform_wrapper' ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 							return true;
 						}
