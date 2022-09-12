@@ -24,6 +24,7 @@ Embedding methods supported:
 * **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
 * [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
+* Ultimate Addons for Elementor By Brainstorm Force.
 * **WPBakery Page Builder**. The following elements has been proven to work: "Gravity Form", Text Block. Other elements could work too, but not tested.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
