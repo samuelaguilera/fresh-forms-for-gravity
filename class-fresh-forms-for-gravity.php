@@ -50,7 +50,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	public function init() {
 		parent::init();
 		// Let's see if we need to stop caching.
-		add_filter( 'template_redirect', array( $this, 'donotcache_and_headers' ) );
+		add_filter( 'template_redirect', array( $this, 'fresh_content' ) );
 
 		// WP Fastest Cache doesn't support DONOTCACHEPAGE ...
 		if ( class_exists( 'WpFastestCache' ) ) {
@@ -280,6 +280,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 */
 	public function check_gf( $post ) {
 
+		// Return false when $post is not an object.
+		if ( ! is_object( $post ) ) {
+			$this->log_debug( __METHOD__ . '(): $post not valid. Returning false.' );
+			return false;
+		}
+
 		// Allow forcing Fresh Form run for certain post ID's without doing the checkings.
 		$post_has_gform = apply_filters( 'freshforms_post_has_gform', array() );
 		if ( ! empty( $post_has_gform ) && in_array( $post->ID, $post_has_gform, true ) ) {
@@ -392,7 +398,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			/*
 			 * UAEL is replacing the default form wrapper with its own, so checking for gform_wrapper is not possible.
 			 * They add their stuff on the fly, it's not saved in the post content, so we can't check for it either.
-			 * Checking for gform_hidden instead as the form has always some hidden inputs.
+			 * Checking for gform_hidden instead as the form has always some hidden inputs added by default.
 			*/
 			$this->log_debug( __METHOD__ . '(): Ultimate Addons for Elementor!' );
 			return true;
@@ -453,7 +459,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		$this->log_debug( __METHOD__ . '(): HTML source: ' . $html );
 		// Look for the gform_wrapper.
 		if ( strpos( $html, $value ) !== false ) {
-			// Class found!
+			// Scanned value found!
 			$this->log_debug( __METHOD__ . "(): {$value} detected in post content." );
 			return true;
 		}
@@ -592,11 +598,17 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Check if we're in a post/page and has the shortcode or block.
+	 * Return true or false to exclude a post/page.
 	 *
 	 * @param integer $post_id      ID of the post.
 	 */
-	public function maybe_no_cache( $post_id ) {
+	public function exclude_the_post( $post_id ) {
+
+		// Prevent going further if no valid post ID is provided.
+		if ( false === ctype_digit( $post_id ) ) {
+			$this->log_debug( __METHOD__ . "(): Post ID provided is not valid: {$post_id}" );
+			return false;
+		}
 
 		$post = get_post( $post_id );
 
@@ -611,19 +623,19 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 *  Prevent caching if a GF shortcode or block is embedded in the post/page.
+	 *  Prevent caching if a GF shortcode or block is embedded in the content.
 	 */
-	public function donotcache_and_headers() {
+	public function fresh_content() {
 
 		global $post;
 
 		// Running only for single posts (any type) and pages.
-		if ( ! is_singular() ) {
+		if ( ! is_object( $post ) || ! is_singular() ) {
 			return;
 		}
 
 		// No shortcode and no block? Do nothing.
-		if ( false === $this->maybe_no_cache( $post->ID ) ) {
+		if ( false === $this->exclude_the_post( $post->ID ) ) {
 			return;
 		}
 
@@ -631,43 +643,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		$this->log_debug( __METHOD__ . '(): Keep it fresh!' );
 
 		// Delete existing cache? No. Why? If the page is cached no PHP will be executed for the page, so we can't do anything.
-
-		// WP Engine System cookie.
-		if ( class_exists( 'WpeCommon' ) ) {
-			/*
-			 * No support for DONOTCACHEPAGE and not filters available. They only allow a few cookies to exclude pages from caching.
-			 * Value is not important really, but I'm using a nonce anyway.
-			 */
-			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
-			$this->log_debug( __METHOD__ . "(): Cookie set for WP Engine System. Path: /$post->post_name/" );
-
-			/*
-			 * WPE doesn't allow third-party caching plugins https://wpengine.com/blog/no-caching-plugins/
-			 * and Cache-Control header modification is not allowed either, so we can stop here for WPE hosted sites.
-			 */
-			return;
-		}
-
-		// Kinsta Cache.
-		if ( class_exists( 'Kinsta\Cache' ) && ! is_admin() && ! is_user_logged_in() ) {
-			/*
-			 * No support for DONOTCACHEPAGE, not filters available, no special cookies. Even no interface for cache exclusion!
-			 * They really don't want to allow you to decide which pages to exclude from their cache by your own.
-			 * That's a bad practice in my opinion. So we have only a dirty hack to avoid caching ¯\_(ツ)_/¯
-			 */
-			setcookie( 'wordpress_logged_in_' . wp_hash( 'pleasekinstaaddsupportfordonotcachepageconstant' ), 1, 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
-			$this->log_debug( __METHOD__ . "(): Cookie set for Kinsta Cache. Path: /$post->post_name/" );
-
-			// As far as I know Kinsta doesn't forbid the use of other caching plugins. So let's Fresh Forms continue...
-
-		}
-
-		// SG Optimizer cookie. This will turn off both x-cache and proxy-cache.
-		if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
-			header( 'X-Cache-Enabled: False', true );
-			setcookie( 'wpSGCacheBypass', 1, 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
-			$this->log_debug( __METHOD__ . "(): Cookie set for SG Optimizer. Path: /$post->post_name/" );
-		}
 
 		// W3TC. Another plugin without documentation for the filters. As far as I know there are no filters to exclude per handler, path to file, etc.
 		if ( class_exists( 'W3TC\Minify_Plugin' ) ) {
@@ -699,22 +674,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			define( 'LITESPEED_DISABLE_ALL', true );
 		}
 
-		// Sets the nocache headers to prevent caching by browsers and proxies respecting these headers.
-		nocache_headers();
-		// Adding no-store value to Cache-Control header for additional enforcement.
-		header( 'Cache-Control: no-store', false );
-		// Adding Fresh-Forms header. Reminder: WPE doesn't support doing modifications to the HTTP headers, so this will not work for WPE hosted sites.
-		header( 'Fresh-Forms: ' . FRESH_FORMS_FOR_GRAVITY_VERSION, false );
-
-		/**
-		 * Optionally add a custom cookie to be used with caching systems not allowing other methods to exclude pages from cache.
-		 * Requires additional setup on your caching software to recognize the cookie created.
-		 */
-		$fresh_forms_cookie = apply_filters( 'freshforms_add_cookie', false );
-		if ( true === $fresh_forms_cookie ) {
-			setcookie( 'FreshForms', 'no-cache', 0, "/$post->post_name/" ); // Will expire at the end of the session (when the browser closes).
-			$this->log_debug( __METHOD__ . "(): FreshForms Cookie added. Path: /$post->post_name/" );
-		}
+		// Adds WP nocache headers and some additional stuff.
+		$this->headers_and_cookies( $post );
 
 	}
 
@@ -726,12 +687,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		global $post;
 
 		// Running only for posts (any type) and pages.
-		if ( ! is_single() && ! is_page() ) {
+		if ( ! is_singular() ) {
 			return;
 		}
 
 		// No shortcode and no block? Do nothing.
-		if ( false === $this->maybe_no_cache( $post->ID ) ) {
+		if ( false === $this->exclude_the_post( $post->ID ) ) {
 			return;
 		}
 
@@ -747,12 +708,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		global $post;
 
 		// Running only for posts (any type) and pages.
-		if ( ! is_single() && ! is_page() ) {
+		if ( ! is_singular() ) {
 			return;
 		}
 
 		// No shortcode and no block? Do nothing.
-		if ( false === $this->maybe_no_cache( $post->ID ) ) {
+		if ( false === $this->exclude_the_post( $post->ID ) ) {
 			return;
 		}
 
@@ -776,17 +737,89 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		global $post;
 
 		// Running only for posts (any type) and pages.
-		if ( ! is_single() && ! is_page() ) {
+		if ( ! is_singular() ) {
 			return;
 		}
 
 		// No shortcode and no block? Do nothing.
-		if ( false === $this->maybe_no_cache( $post->ID ) ) {
+		if ( false === $this->exclude_the_post( $post->ID ) ) {
 			return;
 		}
 
 		// At this point we have a form.
 		add_filter( 'epc_is_cachable', '__return_false', 99 );
+	}
+
+	/**
+	 *  Adds WP nocache headers and some additional stuff.
+	 *
+	 *  @param integer $post The post object.
+	 */
+	public function headers_and_cookies( $post ) {
+
+		// WP Engine System cookie.
+		if ( class_exists( 'WpeCommon' ) ) {
+			/*
+			 * No support for DONOTCACHEPAGE and not filters available. They only allow a few cookies to exclude pages from caching.
+			 * Value is not important really, but I'm using a nonce anyway.
+			 */
+			setcookie( 'wpengine_no_cache', wp_create_nonce( 'fffg' ), 0, $this->return_cookie_path( $post ) ); // Will expire at the end of the session (when the browser closes).
+			$this->log_debug( __METHOD__ . '(): Cookie set for WP Engine System. Path: ' . $this->return_cookie_path( $post ) );
+
+			/*
+			 * WPE doesn't allow third-party caching plugins https://wpengine.com/blog/no-caching-plugins/
+			 * and Cache-Control header modification is not allowed either, so we can stop here for WPE hosted sites.
+			 */
+			return;
+		}
+
+		// Kinsta Cache.
+		if ( class_exists( 'Kinsta\Cache' ) && ! is_admin() && ! is_user_logged_in() ) {
+			/*
+			 * No support for DONOTCACHEPAGE, not filters available, no special cookies. Even no interface for cache exclusion!
+			 * They really don't want to allow you to decide which pages to exclude from their cache by your own.
+			 * That's a bad practice in my opinion. So we have only a dirty hack to avoid caching ¯\_(ツ)_/¯
+			 */
+			setcookie( 'wordpress_logged_in_' . wp_hash( 'pleasekinstaaddsupportfordonotcachepageconstant' ), 1, 0, $this->return_cookie_path( $post ) ); // Will expire at the end of the session (when the browser closes).
+			$this->log_debug( __METHOD__ . '(): Cookie set for Kinsta Cache. Path: ' . $this->return_cookie_path( $post ) );
+
+			// As far as I know Kinsta doesn't forbid the use of other caching plugins. So let's Fresh Forms continue...
+
+		}
+
+		// SG Optimizer cookie. This will turn off both x-cache and proxy-cache.
+		if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
+			header( 'X-Cache-Enabled: False', true );
+			setcookie( 'wpSGCacheBypass', 1, 0, $this->return_cookie_path( $post ) ); // Will expire at the end of the session (when the browser closes).
+			$this->log_debug( __METHOD__ . '(): Cookie set for SG Optimizer. Path: ' . $this->return_cookie_path( $post ) );
+		}
+
+		// Sets the nocache headers to prevent caching by browsers and proxies respecting these headers.
+		nocache_headers();
+		// Adding no-store value to Cache-Control header for additional enforcement.
+		header( 'Cache-Control: no-store', false );
+		// Adding Fresh-Forms header. Reminder: WPE doesn't support doing modifications to the HTTP headers, so this will not work for WPE hosted sites.
+		header( 'Fresh-Forms: ' . FRESH_FORMS_FOR_GRAVITY_VERSION, false );
+
+		/**
+		 * Optionally add a custom cookie to be used with caching systems not allowing other methods to exclude pages from cache.
+		 * Requires additional setup on your caching software to recognize the cookie created.
+		 */
+		$fresh_forms_cookie = apply_filters( 'freshforms_add_cookie', false );
+		if ( true === $fresh_forms_cookie ) {
+			setcookie( 'FreshForms', 'no-cache', 0, $this->return_cookie_path( $post ) ); // Will expire at the end of the session (when the browser closes).
+			$this->log_debug( __METHOD__ . '(): FreshForms Cookie added. Path: ' . $this->return_cookie_path( $post ) );
+		}
+
+	}
+
+	/**
+	 *  Returns the cookie path caching methods requiring a cookie.
+	 *
+	 *  @param integer $post The post object.
+	 */
+	public function return_cookie_path( $post ) {
+		return is_object( $post ) && is_singular() ? "/$post->post_name/" : '/';
 	}
 
 }

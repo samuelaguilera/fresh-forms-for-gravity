@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
  * Author: Samuel Aguilera
- * Version: 1.4
+ * Version: 1.4.3
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.4' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.4.3' );
 
 // Scripts handlers for plugins using them for exclusion filters (e.g. SG Optimizer or Hummingbird).
 $fffg_js_handlers = array(
@@ -35,6 +35,7 @@ $fffg_js_handlers = array(
 	'gform_gravityforms',
 	'gform_conditional_logic',
 	'gform_datepicker_init',
+	'gform_datepicker_legacy', // 2.7+.
 	'plupload-all', // Multi-upload fields.
 	'gform_json',
 	'gform_textarea_counter',
@@ -42,6 +43,7 @@ $fffg_js_handlers = array(
 	'gform_chosen',
 	'gform_placeholder',
 	'gforms_zxcvbn', // Password strength.
+	'password-strength-meter',
 	'gf_partial_entries', // Partial Entries Add-On.
 	'stripe.js', // Stripe Add-On.
 	'stripe_v3',
@@ -64,6 +66,10 @@ $fffg_js_handlers = array(
 	'super_signature_base64',
 	'gform_signature_delete_signature',
 	'gform_recaptcha', // reCAPTCHA.
+	'gform_gravityforms_theme', // 2.7+.
+	'gform_gravityforms_theme_vendors', // 2.7+ (Includes Honeypot hash script).
+	'gform_preview', // Preview window. Just in case...
+	'gform_gravityforms_utils', // 2.7+.
 );
 
 // Scripts partial matches for plugins using them for exclusion filters (e.g. WP-Optimize or WP Rocket).
@@ -93,6 +99,7 @@ $fffg_js_inline_partial = array(
 	'var stripe', // Stripe Checkout.
 	'gform_gravityforms-js-extra',
 	'gform.initializeOnLoaded',
+	'gform', // Try to catch any other gform based script.
 );
 
 // Domains for external JS for exclusion filters (e.g. SG Optimizer or WP Rocket).

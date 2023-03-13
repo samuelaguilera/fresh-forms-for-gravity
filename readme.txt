@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 6.0.2
-Stable tag: 1.4
+Tested up to: 6.1.1
+Stable tag: 1.4.3
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -156,6 +156,12 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.3 =
+
+* Some code refactoring.
+* Prevent warning if $post->ID is not valid for some reason when the function to check for shortcodes is called. Thanks to @bozzmedia for the report.
+* Added some new handlers for GF 2.7+ to the JavaScript handlers exclusion. Thanks to Richard Wawrzyniak.
 
 = 1.4 =
 
