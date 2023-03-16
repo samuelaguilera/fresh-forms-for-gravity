@@ -157,6 +157,12 @@ After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
 
+= 1.4.6 =
+
+* Fixed a fatal error which can happen when purging the cache for WP-Optimize during Fresh Forms initial activation. Thanks to @castoruk for the report.
+* Fixed a fatal error which can happen when purging the cache for Kinsta Cache plugin during Fresh Forms initial activation. Thanks to @squareeye for the report.
+* Improved checks of existing functions for cache purge during activation.
+
 = 1.4.3 =
 
 * Some code refactoring.

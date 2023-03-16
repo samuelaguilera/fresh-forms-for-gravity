@@ -200,7 +200,7 @@ function fffg_purge_all_cache() {
 	}
 
 	// WP Fastest Cache.
-	if ( class_exists( 'WpFastestCache' ) ) {
+	if ( method_exists( 'WpFastestCache', 'deleteCache' ) ) {
 		$wpfc = new WpFastestCache();
 		$wpfc->deleteCache();
 	}
@@ -211,27 +211,27 @@ function fffg_purge_all_cache() {
 	}
 
 	// Autoptimize.
-	if ( class_exists( 'autoptimizeCache' ) ) {
+	if ( method_exists( 'autoptimizeCache', 'clearall' ) ) {
 		autoptimizeCache::clearall();
 	}
 
 	// SG Optimizer.
-	if ( class_exists( 'SiteGround_Optimizer\Supercacher\Supercacher' ) ) {
+	if ( method_exists( 'SiteGround_Optimizer\Supercacher\Supercacher', 'purge_cache' ) ) {
 		SiteGround_Optimizer\Supercacher\Supercacher::purge_cache();
 	}
 
 	// Comet Cache.
-	if ( class_exists( 'comet_cache' ) ) {
+	if ( method_exists( 'comet_cache', 'clear' ) ) {
 		comet_cache::clear();
 	}
 
 	// LiteSpeed Cache.
-	if ( class_exists( 'LiteSpeed_Cache_Purge' ) ) {
+	if ( method_exists( 'LiteSpeed_Cache_Purge', 'all' ) ) {
 		LiteSpeed_Cache_Purge::all();
 	}
 
 	// Hummingbird.
-	if ( class_exists( 'Hummingbird\Core\Filesystem' ) ) {
+	if ( method_exists( 'Hummingbird\Core\Filesystem', 'clean_up' ) ) {
 		// I would use Hummingbird\WP_Hummingbird::flush_cache( true, false ) instead, but it's disabling the page cache option in Hummingbird settings.
 		Hummingbird\Core\Filesystem::instance()->clean_up();
 	}
@@ -244,19 +244,19 @@ function fffg_purge_all_cache() {
 	}
 
 	// WP-Optimize minification files have a different cache.
-	if ( class_exists( 'WP_Optimize_Minify_Cache_Functions' ) ) {
-		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output.
-		$response = WP_Optimize_Minify_Cache_Functions::purge();
+	if ( method_exists( 'WP_Optimize_Minify_Cache_Functions', 'purge' ) ) {
+		$wpo_minify_functions = new WP_Optimize_Minify_Cache_Functions();
+		$response             = $wpo_minify_functions->purge();
 	}
 
 	// Kinsta Cache.
-	if ( class_exists( 'Kinsta\Cache' ) && is_object( $kinsta_cache ) ) {
+	if ( is_object( $kinsta_cache ) && method_exists( $kinsta_cache, 'purge_complete_caches' ) ) {
 		// $kinsta_cache object already created by Kinsta cache.php file.
-		$kinsta_cache->kinsta_cache_purge->purge_complete_full_page_cache();
+		$kinsta_cache->kinsta_cache_purge->purge_complete_caches();
 	}
 
 	// Endurance Page Cache.
-	if ( class_exists( 'Endurance_Page_Cache' ) && is_object( $epc ) ) {
+	if ( is_object( $epc ) && method_exists( $epc, 'purge_all' ) ) {
 		// $epc object already created by endurance-page-cache.php file.
 		$epc->purge_all();
 	}
@@ -274,7 +274,7 @@ function fffg_purge_all_cache() {
 	}
 
 	// Cache Enabler.
-	if ( class_exists( 'Cache_Enabler' ) ) {
+	if ( method_exists( 'Cache_Enabler', 'clear_site_cache' ) ) {
 		Cache_Enabler::clear_site_cache();
 	}
 }
