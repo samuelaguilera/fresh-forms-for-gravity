@@ -237,9 +237,10 @@ function fffg_purge_all_cache() {
 	}
 
 	// WP-Optimize.
-	if ( class_exists( 'WP_Optimize_Cache_Commands' ) ) {
+	if ( method_exists( 'WP_Optimize_Cache_Commands', 'purge_page_cache' ) ) {
+		$wpo_cache_commands = new WP_Optimize_Cache_Commands();
 		// This function returns a response, so I'm assigning it to a variable to prevent unexpected output.
-		$response = WP_Optimize_Cache_Commands::purge_page_cache();
+		$response = $wpo_cache_commands->purge_page_cache();
 	}
 
 	// WP-Optimize minification files have a different cache.
