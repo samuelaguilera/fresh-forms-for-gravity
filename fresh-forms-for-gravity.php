@@ -37,6 +37,7 @@ $fffg_js_handlers = array(
 	'gform_datepicker_init',
 	'gform_datepicker_legacy', // 2.7+.
 	'plupload-all', // Multi-upload fields.
+	'plupload',
 	'gform_json',
 	'gform_textarea_counter',
 	'gform_masked_input',
