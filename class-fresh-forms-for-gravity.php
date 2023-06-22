@@ -87,8 +87,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param string $src    The script's source URL.
 		 */
 		function rocket_loader_exclude_gf_scripts( $tag, $handle, $src ) {
-			global $fffg_js_handlers;
-			if ( is_array( $fffg_js_handlers ) && in_array( $handle, $fffg_js_handlers, true ) ) {
+			if ( is_array( FFFG_JS_HANDLERS ) && in_array( $handle, FFFG_JS_HANDLERS, true ) ) {
 				// Prevent issues with CloudFlare Rocket Loader.
 				$tag = str_replace( "src='", "data-cfasync='false' src='", $tag );
 			}
@@ -108,9 +107,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $exclude_list List of script handlers to exclude.
 		 */
 		function sgo_exclude_gf_scripts( $exclude_list ) {
-			global $fffg_js_handlers;
-
-			$exclude_list = array_merge( $exclude_list, $fffg_js_handlers );
+			$exclude_list = array_merge( $exclude_list, FFFG_JS_HANDLERS );
 
 			return $exclude_list;
 		}
@@ -124,8 +121,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded First few symbols of inline content script.
 		 */
 		function sgo_exclude_inline_gf_scripts( $js_excluded ) {
-			global $fffg_js_inline_partial;
-			$js_excluded = array_merge( $js_excluded, $fffg_js_inline_partial );
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_INLINE_PARTIAL );
 			return $js_excluded;
 		}
 
@@ -153,8 +149,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded Domains for external JS that you want to exclude.
 		 */
 		function sgo_exclude_js_combine_external_scripts( $js_excluded ) {
-			global $fffg_js_external_domain;
-			$js_excluded = array_merge( $js_excluded, $fffg_js_external_domain );
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_EXTERNAL_DOMAIN );
 			return $js_excluded;
 		}
 
@@ -191,8 +186,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded Array of scripts to exclude.
 		 */
 		function wpo_exclude_gf_script_files( $js_excluded ) {
-			global $fffg_js_partial;
-			$js_excluded = array_merge( $js_excluded, $fffg_js_partial );
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_PARTIAL );
 			return $js_excluded;
 		}
 
@@ -231,8 +225,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
 		function wprocket_exclude_gf_defer_js( $js_excluded ) {
-			global $fffg_js_partial;
-			$js_excluded = array_merge( $js_excluded, $fffg_js_partial );
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_PARTIAL );
 			return $js_excluded;
 		}
 
@@ -246,8 +239,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
 		function wprocket_exclude_gf_inline_js( $js_excluded ) {
-			global $fffg_js_inline_partial;
-			$js_excluded = array_merge( $js_excluded, $fffg_js_inline_partial );
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_INLINE_PARTIAL );
 			return $js_excluded;
 		}
 
@@ -261,9 +253,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
 		function wprocket_exclude_gf_js( $js_excluded ) {
-			global $fffg_js_external_domain;
 			// External domains.
-			$js_excluded = array_merge( $js_excluded, $fffg_js_external_domain );
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_EXTERNAL_DOMAIN );
 			// Local paths.
 			$js_excluded[] = '/wp-content/plugins/gravityforms*'; // This is enough to match any script having gravityforms as part of the URL.
 			$js_excluded[] = '/wp-includes/js/dist/a11y.min.js';
