@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
  * Author: Samuel Aguilera
- * Version: 1.4.7
+ * Version: 1.4.8
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.4.7' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.4.8' );
 
 // Scripts handlers for plugins using them for exclusion filters (e.g. SG Optimizer or Hummingbird). - Defined here to allow WordPress functions to access them.
 define(
@@ -290,6 +290,17 @@ function fffg_purge_all_cache() {
 	if ( method_exists( 'Cache_Enabler', 'clear_site_cache' ) ) {
 		Cache_Enabler::clear_site_cache();
 	}
+
+	// Automattic's Page Optimize.
+	if ( function_exists( 'page_optimize_cache_cleanup' ) ) {
+		$cache_folder = false;
+		if ( defined( 'PAGE_OPTIMIZE_CACHE_DIR' ) && ! empty( PAGE_OPTIMIZE_CACHE_DIR ) ) {
+			$cache_folder = PAGE_OPTIMIZE_CACHE_DIR;
+		}
+	
+		page_optimize_cache_cleanup( $cache_folder, 0 /* max file age in seconds */ );
+	}
+
 }
 
 /**

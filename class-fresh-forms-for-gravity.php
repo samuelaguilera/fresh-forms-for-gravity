@@ -262,6 +262,21 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return $js_excluded;
 		}
 
+		// Exclude Gravity Forms scripts from Automattic's Page Optimize plugin.
+		add_filter( 'js_do_concat', 'pageoptimize_exclude_gf_scripts', 99, 2 );
+
+		/**
+		 * Exclude Gravity Forms scripts from Automattic's Page Optimize plugin. No documentation available for this filter.
+		 * No documentation for the filter.
+		 * 
+		 * @param bool $do_concat true concatenates the script.
+		 * @param string $handle  Script handler name.
+		 */
+		function pageoptimize_exclude_gf_scripts( $do_concat, $handle ) {
+			$do_concat = in_array( $handle, FFFG_JS_HANDLERS ) ? false : true;
+			return $do_concat;
+		}
+		
 	}
 
 	/**

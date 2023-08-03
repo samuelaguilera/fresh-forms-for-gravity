@@ -40,6 +40,7 @@ Caching plugins **supported**:
 * Hummingbird
 * Kinsta Cache
 * LiteSpeed Cache
+* [Page Optimize](https://wordpress.org/plugins/page-optimize/) (Script concatenation only)
 * SiteGround Optimizer
 * Surge
 * W3 Total Cache

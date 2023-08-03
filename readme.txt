@@ -43,7 +43,7 @@ There's no options page. Only the plugin version is saved to the database to be 
 
 It should work with any caching plugin with support for DONOTCACHEPAGE constant, and proxies respecting the use Cache-Control HTTP header.
 
-Caching plugins **supported**:
+Caching and Optimization plugins **supported**:
 ---------------------------------------------------------------------
 
 * Autoptimize
@@ -52,6 +52,7 @@ Caching plugins **supported**:
 * Hummingbird
 * Kinsta Cache
 * LiteSpeed Cache
+* [Page Optimize](https://wordpress.org/plugins/page-optimize/) (Script concatenation only)
 * SiteGround Optimizer
 * Surge
 * W3 Total Cache
@@ -156,6 +157,10 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.8 =
+
+* Added support to exclude Gravity Forms scripts from [Page Optimize](https://wordpress.org/plugins/page-optimize/) concatenation feature.
 
 = 1.4.7 =
 
