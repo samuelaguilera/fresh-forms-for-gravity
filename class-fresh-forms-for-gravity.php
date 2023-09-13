@@ -370,7 +370,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		if ( class_exists( 'ACF' ) && true === $acf_support ) {
 			$acf_fields = get_field_objects( $post->ID );
 
-			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields ) ) {
+			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields, $post->ID ) ) {
 				return true;
 			}
 		}
@@ -477,10 +477,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 * Check ACF field content provided for a GF shortcode or form.
 	 *
 	 * @param array $acf_fields ACF Fields saved for the post.
+	 * @param int $post_id The ID of the post we're searching
+	 * 
+	 * @return bool True if the ACF fields contain a GF form
 	 */
-	public function find_gf_acf_field( $acf_fields ) {
+	public function find_gf_acf_field( $acf_fields, $post_id ) {
 		foreach ( $acf_fields as $acf_field ) {
-			if ( $this->acf_field_has_gf( $acf_field ) ) {
+			if ( $this->acf_field_has_gf( $acf_field, $post_id ) ) {
 				$this->log_debug( __METHOD__ . "(): ACF " . $acf_field['type'] . " field has a GF form!" );
 				return true;
 			}
@@ -493,10 +496,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 * Check singular ACF field for GF shortcode or form
 	 * 
 	 * @param array $acf_field The singular ACF field, as a field object, to check
+	 * @param int $post_id The ID of the post the field belongs to
 	 * 
 	 * @return bool True if the field contains a GF shortcode or form
 	 */
-	private function acf_field_has_gf( $acf_field ) {
+	private function acf_field_has_gf( $acf_field, $post_id ) {
 		$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg', 'flexible_content', 'repeater' );
 
 		if ( ! in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
@@ -504,7 +508,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) { // Look for a GF shortcode inside a standalone text or textarea fields.
-			if ( true === $this->find_gf_shortcode( $acf_field['value'], 'gform_wrapper' ) ) {
+			if ( true === $this->find_gf_shortcode( $acf_field['value'] ) ) {
 				return true;
 			}
 		} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class or shortcode inside a standalone wysiwyg field.
@@ -514,7 +518,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 				return true;
 			}
 		} elseif ( ( 'flexible_content' === $acf_field['type'] || 'repeater' === $acf_field['type'] ) && ! empty( $acf_field['value'])) {
-			if ( $this->find_gf_acf_field_in_flexible_content( $acf_field ) ) {
+			if ( $this->find_gf_acf_field_in_flexible_content( $acf_field, $post_id ) ) {
 				return true;
 			}
 		}
@@ -526,19 +530,20 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 * Checks whether a flexible content or repeater field contains a GF shortcode or form
 	 * 
 	 * @param array $acf_field The flexible content or repeater type ACF field object
+	 * @param int $post_id The ID of the post the field belongs to
 	 * 
 	 * @return bool True if the Flexible Content has a supported subfield which contains GF shortcode or form
 	 */
-	private function find_gf_acf_field_in_flexible_content( $acf_field ) {
-		while ( have_rows( $acf_field['key'] ) ) { // Loop all rows
+	private function find_gf_acf_field_in_flexible_content( $acf_field, $post_id ) {
+		while ( have_rows( $acf_field['key'], $post_id ) ) { // Loop all rows
 			$fc_element = the_row();
 			foreach ( $fc_element as $key => $value ) { // Loop all fields in layout
 				if ( 'acf_fc_layout' === $key ) {
 					continue;
 				}
 
-				$subfield = get_field_object( $key );
-				if ( $subfield &&  $this->acf_field_has_gf( $subfield )) {
+				$subfield = get_field_object( $key, $post_id );
+				if ( $subfield &&  $this->acf_field_has_gf( $subfield, $post_id )) {
 					return true;
 				}
 			}
