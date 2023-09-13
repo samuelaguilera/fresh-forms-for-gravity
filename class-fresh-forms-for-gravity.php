@@ -507,8 +507,10 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			if ( true === $this->find_gf_shortcode( $acf_field['value'], 'gform_wrapper' ) ) {
 				return true;
 			}
-		} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
-			if ( true === $this->scan_post_content( $acf_field['value'], 'gform_wrapper' ) ) {
+		} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class or shortcode inside a standalone wysiwyg field.
+			if ( true === $this->find_gf_shortcode( $acf_field['value'] ) ) {
+				return true;
+			} elseif ( true === $this->scan_post_content( $acf_field['value'], 'gform_wrapper' ) ) {
 				return true;
 			}
 		} elseif ( ( 'flexible_content' === $acf_field['type'] || 'repeater' === $acf_field['type'] ) && ! empty( $acf_field['value'])) {
