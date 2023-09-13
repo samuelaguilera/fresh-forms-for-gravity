@@ -542,7 +542,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 					continue;
 				}
 
-				$subfield = get_field_object( $key, $post_id );
+				$subfield = get_sub_field_object( $key );
 				if ( $subfield &&  $this->acf_field_has_gf( $subfield, $post_id )) {
 					return true;
 				}
