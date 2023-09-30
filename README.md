@@ -31,7 +31,7 @@ There's no options page, and **nothing is saved on the database**. Nothing!
 
 It should work with any caching plugin with support for DONOTCACHEPAGE constant, and proxies respecting the use Cache-Control HTTP header.
 
-Caching plugins **supported**:
+Caching and Optimization plugins **supported**:
 ---------------------------------------------------------------------
 
 * Autoptimize

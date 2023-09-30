@@ -176,17 +176,23 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return $js_excluded;
 		}
 
-		// Add Gravity Forms scripts to WP-Optimize default exclusions.
-		add_filter( 'wp-optimize-minify-default-exclusions', 'wpo_exclude_gf_script_files', 99 ); // Lower priority to ensure it runs later than default.
+		/**
+		 * Add Gravity Forms scripts to WP-Optimize default exclusions.
+		 * No documentation available for the filter, but it seems to be valid to use any partial match for the the script path.
+		 */
+		add_filter( 'wp-optimize-minify-default-exclusions', 'partial_match_exclude_gf_js_files', 99 ); // Lower priority to ensure it runs later than default.
 
 		/**
-		 * Exclude Gravity Forms script files from WP-Optimize minification.
-		 * No documentation available for the filter, but it seems to be valid to use any partial match for the the script path.
+		 * Function to exclude scripts for plugin filters using URL partial match.
 		 *
-		 * @param array $js_excluded Array of scripts to exclude.
+		 * @param array $js_excluded Array of scripts partial matches to exclude.
 		 */
-		function wpo_exclude_gf_script_files( $js_excluded ) {
+		function partial_match_exclude_gf_js_files( $js_excluded ) {
+			// External domains.
+			$js_excluded = array_merge( $js_excluded, FFFG_JS_EXTERNAL_DOMAIN );
+			// Local paths.
 			$js_excluded = array_merge( $js_excluded, FFFG_JS_PARTIAL );
+
 			return $js_excluded;
 		}
 
@@ -215,19 +221,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return $action;
 		}
 
-		// Add Gravity Forms scripts to WP Rocket defer JS exclude list.
-		add_filter( 'rocket_exclude_defer_js', 'wprocket_exclude_gf_defer_js', 99 ); // Lower priority to ensure it runs later than default.
-
 		/**
 		 * Exclude Gravity Forms script files from WP Rocket defer.
 		 * Documentation: https://docs.wp-rocket.me/article/976-exclude-files-from-defer-js .
-		 *
-		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
-		function wprocket_exclude_gf_defer_js( $js_excluded ) {
-			$js_excluded = array_merge( $js_excluded, FFFG_JS_PARTIAL );
-			return $js_excluded;
-		}
+		add_filter( 'rocket_exclude_defer_js', 'partial_match_exclude_gf_js_files', 99 ); // Lower priority to ensure it runs later than default.
 
 		// Add Gravity Forms scripts to WP Rocket excluded inline JS combining list.
 		add_filter( 'rocket_excluded_inline_js_content', 'wprocket_exclude_gf_inline_js', 99 ); // Lower priority to ensure it runs later than default.
@@ -243,31 +241,17 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return $js_excluded;
 		}
 
-		// Add Gravity Forms scripts to WP Rocket files minification/concatenation exclude list.
-		add_filter( 'rocket_exclude_js', 'wprocket_exclude_gf_js', 99 ); // Lower priority to ensure it runs later than default.
-
 		/**
 		 * Exclude Gravity Forms script files from WP Rocket minification/concatenation.
 		 * Documentation: https://docs.wp-rocket.me/article/39-excluding-external-js-from-concatenation .
-		 *
-		 * @param array $js_excluded Array of scripts to exclude by WP Rocket.
 		 */
-		function wprocket_exclude_gf_js( $js_excluded ) {
-			// External domains.
-			$js_excluded = array_merge( $js_excluded, FFFG_JS_EXTERNAL_DOMAIN );
-			// Local paths.
-			$js_excluded[] = '/wp-content/plugins/gravityforms*'; // This is enough to match any script having gravityforms as part of the URL.
-			$js_excluded[] = '/wp-includes/js/dist/a11y.min.js';
-			$js_excluded[] = '/wp-includes/js/plupload/plupload.min.js';
-			return $js_excluded;
-		}
+		add_filter( 'rocket_exclude_js', 'partial_match_exclude_gf_js_files', 99 ); // Lower priority to ensure it runs later than default.
 
 		// Exclude Gravity Forms scripts from Automattic's Page Optimize plugin.
 		add_filter( 'js_do_concat', 'pageoptimize_exclude_gf_scripts', 99, 2 );
 
 		/**
 		 * Exclude Gravity Forms scripts from Automattic's Page Optimize plugin. No documentation available for this filter.
-		 * No documentation for the filter.
 		 * 
 		 * @param bool $do_concat true concatenates the script.
 		 * @param string $handle  Script handler name.
@@ -276,6 +260,12 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			$do_concat = in_array( $handle, FFFG_JS_HANDLERS ) ? false : true;
 			return $do_concat;
 		}
+
+		/**
+		 * Exclude Gravity Forms script files from Perfmatters delay scripts feature.
+		 * Documentation: https://perfmatters.io/docs/filters/#perfmatters_delay_js_exclusions and https://perfmatters.io/docs/delay-javascript .
+		 */
+		add_filter( 'perfmatters_delay_js_exclusions', 'partial_match_exclude_gf_js_files', 99 );
 		
 	}
 
@@ -357,7 +347,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		// Look for a GF form added to a product using WooCommerce Gravity Forms Product Add-ons.
 		if ( class_exists( 'WC_GFPA_Main' ) && true === $wcgfpa_support && 'product' === $post->post_type ) {
 			$wc_gfpa_settings = get_post_meta( $post->ID, '_gravity_form_data', true );
-			if ( ! empty( $wc_gfpa_settings ) && is_numeric( $wc_gfpa_settings['id'] ) ) {
+			if ( ! empty( $wc_gfpa_settings ) && is_int( $wc_gfpa_settings['id'] ) ) {
 				$this->log_debug( __METHOD__ . "(): Product ID {$post->ID} has GF form {$wc_gfpa_settings['id']} added as product add-ons form." );
 				return true;
 			}
@@ -611,7 +601,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	public function exclude_the_post( $post_id ) {
 
 		// Prevent going further if no valid post ID is provided.
-		if ( false === ctype_digit( $post_id ) ) {
+		if ( false === is_int( $post_id ) ) {
 			$this->log_debug( __METHOD__ . "(): Post ID provided is not valid: {$post_id}" );
 			return false;
 		}
@@ -723,7 +713,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return;
 		}
 
-		// Exclude form page form cache.
+		// Exclude form page from WP-Optimize cache.
 		add_filter( 'wpo_can_cache_page', '__return_false', 99 ); // Lower priority to ensure it runs later than default.
 		/**
 		 * WP-Optimize exclude minification of the form page.

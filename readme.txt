@@ -53,6 +53,7 @@ Caching and Optimization plugins **supported**:
 * Kinsta Cache
 * LiteSpeed Cache
 * [Page Optimize](https://wordpress.org/plugins/page-optimize/) (Script concatenation only)
+* Perfmatters (Delay JS exclusions only)
 * SiteGround Optimizer
 * Surge
 * W3 Total Cache
@@ -157,6 +158,12 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.11 =
+
+* Optimized code for plugins accepting partial matches for JS files exclusion.
+* Added support for Perfmatters delay JS exclusions. This plugin has other filters to investigate which are not supported yet.
+* Fixed PHP 8.1+ deprecated notice. Thanks to WordPress user @artgoddess for reporting it.
 
 = 1.4.8 =
 
