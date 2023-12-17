@@ -371,7 +371,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return true;
 		}
 
-		// UABB Gravity Forms Styler module detection. Beaver Builder Text Editor module doesn't need this.
+		// Ultimate Addons for Beaver Builder and PowerPack for Beaver Builder Gravity Forms modules detection. Beaver Builder Text Editor module doesn't need this.
 		if ( class_exists( 'FLBuilderModel' ) && FLBuilderModel::is_builder_enabled( $post->ID ) ) {
 			$rows = FLBuilderModel::get_nodes( 'row' );
 
@@ -383,9 +383,15 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 				array()
 			);
 
-			if ( is_array( $module_list ) && in_array( 'uabb-gravity-form', $module_list, true ) ) {
-				$this->log_debug( __METHOD__ . '(): UABB Gravity Forms Styler module detected!' );
-				return true;
+			$bb_gravity_modules = array( 'uabb-gravity-form', 'pp-gravity-form' );
+
+			if ( is_array( $module_list ) ) {
+				foreach ( $bb_gravity_modules as $bb_gravity_module ) {
+					if ( in_array( $bb_gravity_module, $module_list ) ) {
+						$this->log_debug( __METHOD__ . '(): Third-party Gravity Forms Styler module for Beaver Builder detected!' );
+						return true;
+					}
+				}
 			}
 		}
 
