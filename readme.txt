@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 6.3.1
-Stable tag: 1.4.11
+Tested up to: 6.4.2
+Stable tag: 1.4.12
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -36,7 +36,7 @@ This plugin will take care of the above automatically doing the following:
 * [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 * Ultimate Addons for Elementor By Brainstorm Force.
 * **WPBakery Page Builder**. The following elements has been proven to work: "Gravity Form", Text Block. Other elements could work too, but not tested.
-* **PowerPack for Beaver Builder**. Gravity Forms Styler module.
+* **PowerPack for Beaver Builder** Gravity Forms Styler module.
 
 If you're not using any of the above embedding methods you can still use Fresh Forms with a filter to pass the ID number of the posts where you want to run Fresh forms. You can also make Fresh Forms to add a cookie when a form is detected to use this cookie as a way to skip caching for hosts using Varnish based caching. Please see FAQ for more details.
 
@@ -159,6 +159,10 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.12 =
+
+* Added support for PowerPack for Beaver Builder by IdeaBox Creations Gravity Forms Styler module.
 
 = 1.4.11 =
 

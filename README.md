@@ -26,7 +26,7 @@ Embedding methods supported:
 * [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 * Ultimate Addons for Elementor By Brainstorm Force.
 * **WPBakery Page Builder**. The following elements has been proven to work: "Gravity Form", Text Block. Other elements could work too, but not tested.
-* **PowerPack for Beaver Builder**. Gravity Forms Styler module.
+* **PowerPack for Beaver Builder** Gravity Forms Styler module.
 
 There's no options page, and **nothing is saved on the database**. Nothing!
 
