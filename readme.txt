@@ -1,6 +1,6 @@
 === Fresh Forms for Gravity ===
 Contributors: samuelaguilera
-Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
+Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
 Tested up to: 6.4.3
 Stable tag: 1.4.15
@@ -8,7 +8,7 @@ Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
 
-Automatically exclude from cache posts (any type) or pages where the content has a Gravity Forms shortcode or block. WooCommerce products and ACF are supported too. It also deals with some issues caused by automatic JS optimizations done by some caching plugins.
+Exclude pages from cache when a Gravity Forms shortcode or block is detected. Also deals with issues caused by some automatic JS optimizations.
 
 == Description ==
 
