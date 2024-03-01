@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: gravityforms, cache, Gravity Forms, WP Super Cache, W3 Total Cache, W3TC, Autoptimize, SG Optimizer, Comet Cache, WP Rocket, LiteSpeed Cache, Hummingbird, WP Optimize, WP Fastest Cache, CloudFlare, WP Engine, Kinsta
 Requires at least: 4.9
-Tested up to: 6.4.2
-Stable tag: 1.4.12
+Tested up to: 6.4.3
+Stable tag: 1.4.15
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -25,18 +25,18 @@ This plugin will take care of the above automatically doing the following:
 = Embedding methods supported: =
 
 * WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
+* **ACF** fields of type Text, Text Area, and WYSIWYG.
 * **Avada**. The following elements has been proven to work: Content Boxes, "Gravity Form", Modal, Text Block. Other elements could work too, but not tested.
+* **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
+* **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
 * **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
 * [Essential Addons for Elementor](https://wordpress.org/plugins/essential-addons-for-elementor-lite/) Gravity Forms widget.
-* **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
-* [WP Tools Gravity Forms Divi Module](https://wordpress.org/plugins/wp-tools-gravity-forms-divi-module/).
-* **WooCommerce Gravity Forms Product Add-ons** by Lucas Stark.
-* **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**, please see FAQ for more details.
-* **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
+* **PowerPack for Beaver Builder** Gravity Forms Styler module.
 * [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 * Ultimate Addons for Elementor By Brainstorm Force.
+* **WooCommerce Gravity Forms Product Add-ons** by Lucas Stark.
 * **WPBakery Page Builder**. The following elements has been proven to work: "Gravity Form", Text Block. Other elements could work too, but not tested.
-* **PowerPack for Beaver Builder** Gravity Forms Styler module.
+* [WP Tools Gravity Forms Divi Module](https://wordpress.org/plugins/wp-tools-gravity-forms-divi-module/).
 
 If you're not using any of the above embedding methods you can still use Fresh Forms with a filter to pass the ID number of the posts where you want to run Fresh forms. You can also make Fresh Forms to add a cookie when a form is detected to use this cookie as a way to skip caching for hosts using Varnish based caching. Please see FAQ for more details.
 
@@ -70,16 +70,18 @@ Caching plugins **NOT supported**:
 * Breeze. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. **Check FAQ for a workaround.**
 * NitroPack. It doesn't support DONOTCACHEPAGE constant or filters to skip caching. **Check FAQ for a workaround.**
 
-CloudFlare and other proxies:
+Cloudflare and other CDN/proxies:
 -----------------------------
 
 This plugin will add appropriate HTTP header to pages with a Gravity Forms form to exlude the page HTML from caching when the web host setup allows it. 
 
-By default CloudFlare doesn't cache the page HTML, it does only when you have configured it to "Cache Everything". In this case, after activating the plugin, you need to purge cache in your CloudFlare account or wait for cache expiration to let CloudFlare know the page must be excluded from caching.
+By default Cloudflare doesn't cache the page HTML, it does only when you have configured it to "Cache Everything". In this case, after activating the plugin, you need to purge cache in your Cloudflare account or wait for cache expiration to let Cloudflare know the page must be excluded from caching.
 
-Certain hosts like **WP Engine and Kinsta don't allow HTTP headers modification from WordPress side of things**, therefore CloudFlare support will not work for these hosts.
+Certain hosts like **WP Engine and Kinsta don't allow HTTP headers modification from WordPress side of things**, therefore Cloudflare support will not work for these hosts.
 
 Other proxy services should work in a similar way, but I don't have access to test any other proxy service. Feel to reach me if you want to provide me access to add support for your proxy service (documentation for the proxy would be required).
+
+Note for these cases (caching is done by an external service), Fresh Forms can just include the HTTP header when your web host allows it. Once the header is added, it's up to the CDN/proxy being used to obey the header and skip caching for the page.
 
 = Requirements =
 
@@ -98,13 +100,17 @@ Just install and activate, no settings page.
 
 As stated on this plugin description it supports the **LiteSpeed Cache plugin**, NOT LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install [LiteSpeed Cache plugin](https://wordpress.org/plugins/litespeed-cache/) before installing Fresh Forms for Gravity.
 
-= I want to enable ACF support =
+= I want to disable ACF support =
 
 ACF fields of the following types are supported as standalone fields and also as subfields of a Flexible Content or Repeater field: Text, Text Area, WYSIWYG.
 
-To enable ACF support add the following line to your theme's functions.php file or a custom functionality plugin.
+Since version 1.4.14 ACF support is enabled by default when the ACF plugin is enabled for the site.
 
-`add_filter( 'freshforms_acf_support', '__return_true' );`
+You can disable ACF support by adding the following line to your theme's functions.php file or a custom functionality plugin.
+
+`add_filter( 'freshforms_acf_support', '__return_false' );`
+
+Note: Fresh Forms runs the check for form shortcodes added to ACF fields only when it was unable to detect a form in other supported embedding methods. So probably you don't need to use this filter, its original purpose was to enable ACF support when it wasn't enabled by default.
 
 = I want Fresh Forms to run for certain posts where I'm embedding forms using an embed method that is not supported. =
 
@@ -159,6 +165,12 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.15 =
+
+* ACF support is now enabled by default when the ACF plugin is enabled for the site.
+* Changed ACF checks to the last position of possible checks to avoid running them when the form is already detected in any other embedding method.
+* Improved logging message for the scan_content() function used for ACF and UAEL.
 
 = 1.4.12 =
 

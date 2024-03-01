@@ -136,7 +136,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		function sgo_exclude_gf_pages_html_minify( $exclude_params ) {
 			$exclude_params[] = 'signature'; // Signatures.
 			$exclude_params[] = 'gf-signature'; // Signatures since 4.0, old links still use the above.
-			$exclude_params[] = 'gf-download'; // Downloads.
+			$exclude_params[] = 'gf-download'; // Secure Downloads.
 
 			return $exclude_params;
 		}
@@ -353,18 +353,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			}
 		}
 
-		// ACF Support disabled by default.
-		$acf_support = apply_filters( 'freshforms_acf_support', false );
-
-		// Look for a GF shortcode inside ACF fields.
-		if ( class_exists( 'ACF' ) && true === $acf_support ) {
-			$acf_fields = get_field_objects( $post->ID );
-
-			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields ) ) {
-				return true;
-			}
-		}
-
 		// Look for a GF form embedded using WP Tools Gravity Forms Divi Module plugin.
 		if ( class_exists( 'WPT_Divi_Gravity_Modules\\GravityFormExtension' ) && has_shortcode( $post->post_content, 'et_pb_wpt_gravityform' ) ) {
 			$this->log_debug( __METHOD__ . '(): WP Tools Gravity Forms Divi Module detected!' );
@@ -396,7 +384,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		// Check for Ultimate Addons for Elementor By Brainstorm Force.
-		if ( class_exists( 'UAEL_Loader' ) && $this->scan_post_content( $post->post_content, 'gform_hidden' ) ) {
+		if ( class_exists( 'UAEL_Loader' ) && $this->scan_content( $post->post_content, 'gform_hidden', 'UAEL' ) ) {
 			/*
 			 * UAEL is replacing the default form wrapper with its own, so checking for gform_wrapper is not possible.
 			 * They add their stuff on the fly, it's not saved in the post content, so we can't check for it either.
@@ -404,6 +392,20 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			*/
 			$this->log_debug( __METHOD__ . '(): Ultimate Addons for Elementor!' );
 			return true;
+		}
+
+		// ACF Support enabled by default if ACF is enabled, otherwise disabled.
+		$acf_status = class_exists( 'ACF' ) ? true : false;
+		$acf_support = apply_filters( 'freshforms_acf_support', $acf_status );
+
+		// Look for a GF shortcode inside ACF fields.
+		if ( true === $acf_support ) {
+			$this->log_debug( __METHOD__ . '(): ACF support is enabled.' );
+			$acf_fields = get_field_objects( $post->ID );
+
+			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields ) ) {
+				return true;
+			}
 		}
 
 		// If we're here, no form was detected.
@@ -452,15 +454,16 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
-	 * Search for the value provided inside the HTML passed.
+	 * Search for the value provided inside the content passed.
 	 *
-	 * @param string $html      HTML content for searching.
-	 * @param string $value     The value to search.
+	 * @param string $content    Content for searching.
+	 * @param string $value      The value to search.
+	 * @param string $generation The software that generates the content to scan.
 	 */
-	public function scan_post_content( $html, $value ) {
-		$this->log_debug( __METHOD__ . '(): HTML source: ' . $html );
+	public function scan_content( $content, $value, $generator ) {
+		$this->log_debug( __METHOD__ . "(): {$generator} content to scan: {$content} " );
 		// Look for the gform_wrapper.
-		if ( strpos( $html, $value ) !== false ) {
+		if ( strpos( $content, $value ) !== false ) {
 			// Scanned value found!
 			$this->log_debug( __METHOD__ . "(): {$value} detected in post content." );
 			return true;
@@ -489,7 +492,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 					return true;
 				}
 			} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
-				if ( true === $this->scan_post_content( $acf_field['value'], 'gform_wrapper' ) ) {
+				if ( true === $this->scan_content( $acf_field['value'], 'gform_wrapper', 'ACF' ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 					return true;
 				}
@@ -500,7 +503,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 						if ( true === $this->find_gf_shortcode( $value ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 							return true;
-						} elseif ( true === $this->scan_post_content( $value, 'gform_wrapper' ) ) {
+						} elseif ( true === $this->scan_content( $value, 'gform_wrapper', 'ACF' ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 							return true;
 						}
