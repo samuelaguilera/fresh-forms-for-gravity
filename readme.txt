@@ -55,7 +55,7 @@ Caching and Optimization plugins **supported**:
 * LiteSpeed Cache
 * [Page Optimize](https://wordpress.org/plugins/page-optimize/) (Script concatenation only)
 * Perfmatters (Delay JS exclusions only)
-* SiteGround Optimizer
+* Speed Optimizer (by SiteGround, the plugin with more name changes in the history of WordPress!)
 * Surge
 * W3 Total Cache
 * WP Engine System

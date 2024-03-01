@@ -42,7 +42,7 @@ Caching and Optimization plugins **supported**:
 * Kinsta Cache
 * LiteSpeed Cache
 * [Page Optimize](https://wordpress.org/plugins/page-optimize/) (Script concatenation only)
-* SiteGround Optimizer
+* Speed Optimizer (by SiteGround, the plugin with more name changes in the history of WordPress!)
 * Surge
 * W3 Total Cache
 * WP Engine System
