@@ -420,6 +420,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 */
 	public function find_gf_shortcode( $post_content ) {
 
+		// Prevent fatal error if post content is not a string (as required by WordPress has_shortcode function).
+		// Which could happen for not supported embedding methods or when a third-party is altering the expected post content.
+		if ( ! is_string( $post_content ) ) {
+			$this->log_debug( __METHOD__ . '(): Post Content is not a string. Aborting...' );
+			return false;
+		}
+
 		// Check for a GF shortcode.
 		if ( has_shortcode( $post_content, 'gravityform' ) ) {
 			// Shortcode found!
@@ -461,6 +468,13 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 * @param string $generation The software that generates the content to scan.
 	 */
 	public function scan_content( $content, $value, $generator ) {
+
+		// Return without scanning if there's no content to scan.
+		if ( empty( $content ) ){
+			$this->log_debug( __METHOD__ . "(): {$generator} content is empty. Nothing to scan." );
+			return false;
+		}
+
 		$this->log_debug( __METHOD__ . "(): {$generator} content to scan: {$content} " );
 		// Look for the gform_wrapper.
 		if ( strpos( $content, $value ) !== false ) {
@@ -482,17 +496,19 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg', 'flexible_content', 'repeater' );
 
 		foreach ( $acf_fields as $acf_field ) {
+			//$this->log_debug( __METHOD__ . '(): ACF field properties: ' . print_r( $acf_field, true ) );
+
 			if ( ! in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
 				continue;
 			}
 
 			if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) { // Look for a GF shortcode inside a standalone text or textarea fields.
-				if ( true === $this->find_gf_shortcode( $acf_field['value'], 'gform_wrapper' ) ) {
+				if ( is_string( $acf_field['value'] ) && true === $this->find_gf_shortcode( $acf_field['value'] ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 					return true;
 				}
 			} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
-				if ( true === $this->scan_content( $acf_field['value'], 'gform_wrapper', 'ACF' ) ) {
+				if ( is_string( $acf_field['value'] ) && true === $this->scan_content( $acf_field['value'], 'gform_wrapper', 'ACF' ) ) {
 					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 					return true;
 				}
@@ -500,10 +516,10 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 				// Look for a GF shortcode or GF class inside the value of any sub-field for a flexible_content field.
 				foreach ( $acf_field['value'] as $acf_subfield_array ) {
 					foreach ( $acf_subfield_array as $key => $value ) {
-						if ( true === $this->find_gf_shortcode( $value ) ) {
+						if ( is_string( $value ) && true === $this->find_gf_shortcode( $value ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 							return true;
-						} elseif ( true === $this->scan_content( $value, 'gform_wrapper', 'ACF' ) ) {
+						} elseif ( is_string( $value ) && true === $this->scan_content( $value, 'gform_wrapper', 'ACF' ) ) {
 							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
 							return true;
 						}

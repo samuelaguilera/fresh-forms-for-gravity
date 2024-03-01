@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
 Tested up to: 6.4.3
-Stable tag: 1.4.15
+Stable tag: 1.4.16
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -165,6 +165,10 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.16 =
+
+* Prevent fatal error if post content is not a string (as required by WordPress has_shortcode function). Which could happen for not supported embedding methods or when a third-party is altering the expected post content.
 
 = 1.4.15 =
 
