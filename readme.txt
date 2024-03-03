@@ -3,7 +3,7 @@ Contributors: samuelaguilera
 Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
 Tested up to: 6.4.3
-Stable tag: 1.4.16
+Stable tag: 1.4.17
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -24,8 +24,8 @@ This plugin will take care of the above automatically doing the following:
 
 = Embedding methods supported: =
 
-* WordPress default editor, shortcode or Gutenberg block. Content of any post type, including pages and custom posts.
-* **ACF** fields of type Text, Text Area, and WYSIWYG.
+* **WordPress default editor, shortcode or Gutenberg block**. Content of any post type, including pages and custom posts.
+* **ACF** fields of type Text, Text Area, and WYSIWYG. **Requires a filter to enable it**, see the FAQ for more details.
 * **Avada**. The following elements has been proven to work: Content Boxes, "Gravity Form", Modal, Text Block. Other elements could work too, but not tested.
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
 * **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
@@ -100,17 +100,13 @@ Just install and activate, no settings page.
 
 As stated on this plugin description it supports the **LiteSpeed Cache plugin**, NOT LiteSpeed server directly. So if you're using a LiteSpeed based web host, you need to install [LiteSpeed Cache plugin](https://wordpress.org/plugins/litespeed-cache/) before installing Fresh Forms for Gravity.
 
-= I want to disable ACF support =
+= I want to enable ACF support =
 
 ACF fields of the following types are supported as standalone fields and also as subfields of a Flexible Content or Repeater field: Text, Text Area, WYSIWYG.
 
-Since version 1.4.14 ACF support is enabled by default when the ACF plugin is enabled for the site.
+To enable ACF support add the following line to your theme's functions.php file or a custom functionality plugin.
 
-You can disable ACF support by adding the following line to your theme's functions.php file or a custom functionality plugin.
-
-`add_filter( 'freshforms_acf_support', '__return_false' );`
-
-Note: Fresh Forms runs the check for form shortcodes added to ACF fields only when it was unable to detect a form in other supported embedding methods. So probably you don't need to use this filter, its original purpose was to enable ACF support when it wasn't enabled by default.
+`add_filter( 'freshforms_acf_support', '__return_true' );`
 
 = I want Fresh Forms to run for certain posts where I'm embedding forms using an embed method that is not supported. =
 
@@ -165,6 +161,10 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.4.17 =
+
+* Reverted ACF support back to disabled by default.
 
 = 1.4.16 =
 

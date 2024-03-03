@@ -394,12 +394,11 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return true;
 		}
 
-		// ACF Support enabled by default if ACF is enabled, otherwise disabled.
-		$acf_status = class_exists( 'ACF' ) ? true : false;
-		$acf_support = apply_filters( 'freshforms_acf_support', $acf_status );
+		// ACF Support disabled by default.
+		$acf_support = apply_filters( 'freshforms_acf_support', false );
 
 		// Look for a GF shortcode inside ACF fields.
-		if ( true === $acf_support ) {
+		if ( class_exists( 'ACF' ) && true === $acf_support ) {
 			$this->log_debug( __METHOD__ . '(): ACF support is enabled.' );
 			$acf_fields = get_field_objects( $post->ID );
 
