@@ -45,6 +45,73 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	}
 
 	/**
+	 * Return the plugin's icon for the plugin/form settings menu.
+	 *
+	 * @return string
+	 */
+	public function get_menu_icon() {
+		return file_get_contents( $this->get_base_path() . '/images/menu-icon.svg' ); // phpcs:ignore
+	}
+
+	/**
+	 * Configures the settings which should be rendered on the add-on settings tab.
+	 *
+	 * @return array
+	 */
+	public function plugin_settings_fields() {
+
+		return array(
+			array(
+				'title'       => esc_html__( 'ACF Settings', 'fresh-forms-for-gravity' ),
+				'description' => '<p style="text-align: left;">' . esc_html__( 'Enable optional ACF support using the settings below.', 'fresh-forms-for-gravity' ) . '</p>',
+				'fields'      => array(
+					array(
+						'name'    => 'acf',
+						'label'   => esc_html__( 'Search ACF fields for:', 'fresh-forms-for-gravity' ),
+						'type'    => 'checkbox',
+						'choices' => array(
+							array(
+								'label'         => esc_html__( 'Gravity Forms shortcode', 'fresh-forms-for-gravity' ),
+								'name'          => 'acf_shortcode',
+								'default_value' => 0,
+							),
+							array(
+								'label'         => esc_html__( 'Gravity Forms gform_wrapper class', 'fresh-forms-for-gravity' ),
+								'name'          => 'acf_scan',
+								'default_value' => 0,
+								'tooltip'       => esc_html__( 'Enable this option only if the shortcode option is not able to detect the form.', 'fresh-forms-for-gravity' ),
+							),
+						),
+					),
+				),
+			),
+			array(
+				'title'  => esc_html__( 'Other Settings', 'fresh-forms-for-gravity' ),
+				'fields' => array(
+					array(
+						'type'          => 'text',
+						'name'          => 'force_has_form',
+						'label'         => esc_html__( 'Force Fresh Forms to run for the following page or post IDs', 'fresh-forms-for-gravity' ),
+						'tooltip'       => esc_html__( 'This is useful if your caching plugin is supported but the embedding method is not.', 'fresh-forms-for-gravity' ),
+						'default_value' => '',
+						'after_input'   => esc_html__( 'Enter a comma separated list. Example: 6,8,5,3', 'fresh-forms-for-gravity' ),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Handles save of settings and clearing cache after it.
+	 *
+	 * @param array $settings Plugin settings to be saved.
+	 */
+	public function update_plugin_settings( $settings ) {
+		parent::update_plugin_settings( $settings );
+		fffg_purge_all_cache(); // Clear the site cache after saving settings.
+	}
+
+	/**
 	 * Handles hooks.
 	 */
 	public function init() {
@@ -252,8 +319,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		/**
 		 * Exclude Gravity Forms scripts from Automattic's Page Optimize plugin. No documentation available for this filter.
-		 * 
-		 * @param bool $do_concat true concatenates the script.
+		 *
+		 * @param bool   $do_concat true concatenates the script.
 		 * @param string $handle  Script handler name.
 		 */
 		function pageoptimize_exclude_gf_scripts( $do_concat, $handle ) {
@@ -266,7 +333,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * Documentation: https://perfmatters.io/docs/filters/#perfmatters_delay_js_exclusions and https://perfmatters.io/docs/delay-javascript .
 		 */
 		add_filter( 'perfmatters_delay_js_exclusions', 'partial_match_exclude_gf_js_files', 99 );
-		
 	}
 
 	/**
@@ -283,9 +349,14 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		// Allow forcing Fresh Form run for certain post ID's without doing the checkings.
-		$post_has_gform = apply_filters( 'freshforms_post_has_gform', array() );
+		$force_has_form = $this->get_plugin_setting( 'force_has_form' ) ? $this->get_plugin_setting( 'force_has_form' ) : '';
+		// Remove any empty spaces and convert to array.
+		$force_has_form = array_map( 'intval', explode( ',', preg_replace( '/\s+/', '', $force_has_form ) ) );
+
+		$post_has_gform = apply_filters( 'freshforms_post_has_gform', $force_has_form );
+
 		if ( ! empty( $post_has_gform ) && in_array( $post->ID, $post_has_gform, true ) ) {
-			$this->log_debug( __METHOD__ . '(): freshforms_post_has_gform filter in use.' );
+			$this->log_debug( __METHOD__ . "(): Form detection forced to return true by setting or filter for post ID {$post->ID}." );
 			return true;
 		}
 
@@ -365,7 +436,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 			$module_list = array_reduce(
 				$rows,
-				function( $module_list, $row ) {
+				function ( $module_list, $row ) {
 					return array_merge( $module_list, $this->get_row_module_list( $row ) );
 				},
 				array()
@@ -394,22 +465,23 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return true;
 		}
 
-		// ACF Support disabled by default.
-		$acf_support = apply_filters( 'freshforms_acf_support', false );
+		// Legacy freshforms_acf_support filter.
+		$shortcode = apply_filters_deprecated( 'freshforms_acf_support', array( $this->get_plugin_setting( 'acf_shortcode' ) ), '1.5' );
+		$scan      = apply_filters_deprecated( 'freshforms_acf_support', array( $this->get_plugin_setting( 'acf_scan' ) ), '1.5' );
 
-		// Look for a GF shortcode inside ACF fields.
-		if ( class_exists( 'ACF' ) && true === $acf_support ) {
+		$acf_support = $shortcode || $scan ? true : false;
+
+		if ( class_exists( 'ACF' ) && true == $acf_support ) {
 			$this->log_debug( __METHOD__ . '(): ACF support is enabled.' );
-			$acf_fields = get_field_objects( $post->ID );
+			$acf_fields = get_field_objects( $post->ID, true, false ); // Get ACF fields without the value.
 
-			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields ) ) {
+			if ( is_array( $acf_fields ) && true === $this->find_gf_acf_field( $acf_fields, $shortcode, $scan ) ) {
 				return true;
 			}
 		}
 
 		// If we're here, no form was detected.
 		return false;
-
 	}
 
 	/**
@@ -462,15 +534,15 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	/**
 	 * Search for the value provided inside the content passed.
 	 *
-	 * @param string $content    Content for searching.
-	 * @param string $value      The value to search.
-	 * @param string $generation The software that generates the content to scan.
+	 * @param string $content   Content for searching.
+	 * @param string $value     The value to search.
+	 * @param string $generator The software that generates the content to scan.
 	 */
 	public function scan_content( $content, $value, $generator ) {
 
 		// Return without scanning if there's no content to scan.
-		if ( empty( $content ) ){
-			$this->log_debug( __METHOD__ . "(): {$generator} content is empty. Nothing to scan." );
+		if ( ! is_string( $content ) || empty( $content ) ) {
+			$this->log_debug( __METHOD__ . "(): {$generator} content is empty or not a string. Nothing to scan." );
 			return false;
 		}
 
@@ -489,42 +561,72 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	 * Check ACF field content provided for a GF shortcode or form.
 	 *
 	 * @param array $acf_fields ACF Fields saved for the post.
+	 * @param bool  $shortcode  Set to true to scan ACF fields for a GF shortocode.
+	 * @param bool  $scan       Set to true to scan ACF fields for the gform_wrapper class.
 	 */
-	public function find_gf_acf_field( $acf_fields ) {
+	public function find_gf_acf_field( $acf_fields, $shortcode = false, $scan = false ) {
 
 		$supported_acf_fields = array( 'text', 'textarea', 'wysiwyg', 'flexible_content', 'repeater' );
 
 		foreach ( $acf_fields as $acf_field ) {
-			//$this->log_debug( __METHOD__ . '(): ACF field properties: ' . print_r( $acf_field, true ) );
 
 			if ( ! in_array( $acf_field['type'], $supported_acf_fields, true ) ) {
+				$this->log_debug( __METHOD__ . "(): ACF field not supported. Skipping field: {$acf_field['name']}" );
 				continue;
 			}
 
-			if ( 'text' === $acf_field['type'] || 'textarea' === $acf_field['type'] ) { // Look for a GF shortcode inside a standalone text or textarea fields.
-				if ( is_string( $acf_field['value'] ) && true === $this->find_gf_shortcode( $acf_field['value'] ) ) {
-					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-					return true;
+			// Get the field content. No need to set the post id as the list of fields received is already limited to the current post.
+			$acf_field_content = get_field( $acf_field['name'] ); // Using name which in this case means "custom field meta key name".
+
+			if ( true == $shortcode ) { // Check for GF shortcodes added to ACF fields if it's enabled.
+
+				// Look for a GF shortcode inside a standalone text or textarea fields.
+				if ( ( is_string( $acf_field_content ) && 'text' === $acf_field['type'] ) || ( is_string( $acf_field_content ) && 'textarea' === $acf_field['type'] ) ) {
+					$this->log_debug( __METHOD__ . "(): Checking for GF shorcodes added to ACF field {$acf_field['name']}" );
+					if ( true === $this->find_gf_shortcode( $acf_field_content ) ) {
+						$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
+						return true;
+					}
 				}
-			} elseif ( 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
-				if ( is_string( $acf_field['value'] ) && true === $this->scan_content( $acf_field['value'], 'gform_wrapper', 'ACF' ) ) {
-					$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-					return true;
-				}
-			} elseif ( ( 'flexible_content' === $acf_field['type'] || 'repeater' === $acf_field['type'] ) && ! empty( $acf_field['value'] ) ) {
-				// Look for a GF shortcode or GF class inside the value of any sub-field for a flexible_content field.
-				foreach ( $acf_field['value'] as $acf_subfield_array ) {
-					foreach ( $acf_subfield_array as $key => $value ) {
-						if ( is_string( $value ) && true === $this->find_gf_shortcode( $value ) ) {
-							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-							return true;
-						} elseif ( is_string( $value ) && true === $this->scan_content( $value, 'gform_wrapper', 'ACF' ) ) {
-							$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
-							return true;
+
+				if ( ( 'flexible_content' === $acf_field['type'] || 'repeater' === $acf_field['type'] ) && ! empty( $acf_field_content ) ) {
+					// Look for a GF shortcode inside the value of any sub-field for a flexible_content or repeater field.
+					foreach ( $acf_field_content as $acf_subfield_array ) {
+						foreach ( $acf_subfield_array as $key => $value ) {
+							$this->log_debug( __METHOD__ . "(): Checking for GF shorcodes added to ACF field {$acf_field['name']}" );
+							if ( is_string( $value ) && true === $this->find_gf_shortcode( $value ) ) {
+								$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
+								return true;
+							}
 						}
 					}
 				}
-			}
+			} // Shortcode search done.
+
+			if ( true == $scan ) { // Check for GF class added to ACF fields if it's enabled.
+
+				if ( is_string( $acf_field_content ) && 'wysiwyg' === $acf_field['type'] ) { // Look for a GF class inside a standalone wysiwyg field.
+					$this->log_debug( __METHOD__ . "(): Checking GF HTML markup for ACF field {$acf_field['name']}" );
+					if ( true === $this->scan_content( $acf_field_content, 'gform_wrapper', 'ACF' ) ) {
+						$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
+						return true;
+					}
+				}
+
+				if ( ( 'flexible_content' === $acf_field['type'] || 'repeater' === $acf_field['type'] ) && ! empty( $acf_field_content ) ) {
+					// Look for a GF shortcode or GF class inside the value of any sub-field for a flexible_content or repeater field.
+					foreach ( $acf_field_content as $acf_subfield_array ) {
+						foreach ( $acf_subfield_array as $key => $value ) {
+							$this->log_debug( __METHOD__ . "(): Checking GF HTML markup for ACF field {$acf_field['name']}" );
+							if ( is_string( $value ) && true === $this->scan_content( $value, 'gform_wrapper', 'ACF' ) ) {
+								$this->log_debug( __METHOD__ . "(): ACF {$acf_field['type']} field has a GF form!" );
+								return true;
+							}
+						}
+					}
+				}
+			} // Class scan done.
+
 		}
 		// If we're here, there's no ACF field with a GF form.
 		return false;
@@ -546,7 +648,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		return array_reduce(
 			$groups,
-			function( $module_list, $group ) {
+			function ( $module_list, $group ) {
 				return array_merge( $module_list, $this->get_group_module_list( $group ) );
 			},
 			array()
@@ -566,7 +668,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		return array_reduce(
 			$cols,
-			function( $module_list, $col ) {
+			function ( $module_list, $col ) {
 				return array_merge( $module_list, $this->get_column_module_list( $col ) );
 			},
 			array()
@@ -591,7 +693,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		return array_reduce(
 			$nodes,
-			function( $module_list, $node ) {
+			function ( $module_list, $node ) {
 				return array_merge( $module_list, $this->get_beaver_builder_node_module_list( $node ) );
 			},
 			array()
@@ -696,7 +798,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 
 		// Adds WP nocache headers and some additional stuff.
 		$this->headers_and_cookies( $post );
-
 	}
 
 	/**
@@ -746,7 +847,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 */
 		add_filter( 'wpo_minify_exclude_contents', '__return_true', 99 ); // Lower priority to ensure it runs later than default.
 		add_filter( 'wpo_minify_run_on_page', '__return_true', 99 ); // Lower priority to ensure it runs later than default.
-
 	}
 
 	/**
@@ -830,7 +930,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			setcookie( 'FreshForms', 'no-cache', 0, $this->return_cookie_path( $post ) ); // Will expire at the end of the session (when the browser closes).
 			$this->log_debug( __METHOD__ . '(): FreshForms Cookie added. Path: ' . $this->return_cookie_path( $post ) );
 		}
-
 	}
 
 	/**
@@ -841,5 +940,4 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 	public function return_cookie_path( $post ) {
 		return is_object( $post ) && is_singular() ? "/$post->post_name/" : '/';
 	}
-
 }

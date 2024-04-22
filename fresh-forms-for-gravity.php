@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Fresh Forms for Gravity
- * Description: Prevent posts and pages with a Gravity Forms shortcode or Gutenberg block from being cached.
+ * Description: Prevent supported caching and JS optimization plugins breaking Gravity Forms.
  * Author: Samuel Aguilera
- * Version: 1.4.17
+ * Version: 1.5
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.4.17' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.5' );
 
 // Scripts handlers for plugins using them for exclusion filters (e.g. SG Optimizer or Hummingbird). - Defined here to allow WordPress functions to access them.
 define(
@@ -109,6 +109,8 @@ define(
 		'gform_gravityforms-js-extra',
 		'gform.initializeOnLoaded',
 		'gform', // Try to catch any other gform based script.
+		'gform_gravityforms_theme-js-extra', // Honeypot.
+		'version_hash', // Honeypot.
 	)
 );
 
@@ -161,7 +163,6 @@ class Fresh_Forms_For_Gravity_Bootstrap {
 
 		GFAddOn::register( 'Fresh_Forms_For_Gravity' );
 	}
-
 }
 
 /**
@@ -297,10 +298,8 @@ function fffg_purge_all_cache() {
 		if ( defined( 'PAGE_OPTIMIZE_CACHE_DIR' ) && ! empty( PAGE_OPTIMIZE_CACHE_DIR ) ) {
 			$cache_folder = PAGE_OPTIMIZE_CACHE_DIR;
 		}
-	
 		page_optimize_cache_cleanup( $cache_folder, 0 /* max file age in seconds */ );
 	}
-
 }
 
 /**
@@ -323,5 +322,4 @@ function fffg_actions_after_update() {
 
 	// Update stored version.
 	update_option( 'fffg_version', FRESH_FORMS_FOR_GRAVITY_VERSION );
-
 }
