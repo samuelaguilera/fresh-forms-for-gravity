@@ -166,7 +166,7 @@ After doing the above, you need to **flush your host and browser cache**.
 
 * Improved ACF support by requesting the field content only for supported types.
 * Added a settings page for optional settings.
-* Filter freshforms_acf_support is now deprecated in favor or the new settings page.
+* Filter freshforms_acf_support is now deprecated in favor of the new settings page.
 
 = 1.4.17 =
 
