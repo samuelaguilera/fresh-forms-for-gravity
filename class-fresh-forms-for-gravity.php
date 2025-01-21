@@ -453,6 +453,19 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return true;
 		}
 
+		/**
+		 * Support for GravityKit Gravity Forms Widget for Elementor.
+		 */
+		if ( class_exists( 'GravityKit\GravityFormsElementorWidget\Widget' ) && 'builder' === get_post_meta( $post->ID, '_elementor_edit_mode', true ) ) {
+
+			$elementor_data = get_post_meta( $post->ID, '_elementor_data', true );
+
+			if ( strpos( $elementor_data, 'gk_elementor_gravity_form' ) !== false ) {
+				$this->log_debug( __METHOD__ . '(): GravityKit Gravity Forms Widget for Elementor widget detected!' );
+				return true;
+			}
+		}
+
 		// Legacy freshforms_acf_support filter.
 		$shortcode = apply_filters_deprecated( 'freshforms_acf_support', array( $this->get_plugin_setting( 'acf_shortcode' ) ), '1.5' );
 		$scan      = apply_filters_deprecated( 'freshforms_acf_support', array( $this->get_plugin_setting( 'acf_scan' ) ), '1.5' );

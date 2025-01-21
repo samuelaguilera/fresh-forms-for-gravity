@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
-Tested up to: 6.5.5
-Stable tag: 1.5.2
+Tested up to: 6.7.1
+Stable tag: 1.5.3
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -163,6 +163,10 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.5.3 =
+
+* Added support for GravityKit Gravity Forms Widget for Elementor.
 
 = 1.5.2 =
 

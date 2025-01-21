@@ -21,6 +21,7 @@ Embedding methods supported:
 * **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
 * **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
 * [Essential Addons for Elementor](https://wordpress.org/plugins/essential-addons-for-elementor-lite/) Gravity Forms widget.
+* GravityKit Gravity Forms Widget for Elementor.
 * **PowerPack for Beaver Builder** Gravity Forms Styler module.
 * [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 * Ultimate Addons for Elementor By Brainstorm Force.
