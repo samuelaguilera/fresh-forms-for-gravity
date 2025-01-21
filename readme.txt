@@ -2,8 +2,8 @@
 Contributors: samuelaguilera
 Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
-Tested up to: 6.4.3
-Stable tag: 1.5
+Tested up to: 6.5.5
+Stable tag: 1.5.2
 Requires PHP: 7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.en.html
@@ -28,9 +28,11 @@ This plugin will take care of the above automatically doing the following:
 * **ACF** fields of type Text, Text Area, and WYSIWYG. **Disabled by default**.
 * **Avada**. The following elements has been proven to work: Content Boxes, "Gravity Form", Modal, Text Block. Other elements could work too, but not tested.
 * **Beaver Builder**. It will detect Gravity Forms shortcodes added to a Text Editor module.
+* **Conversational Forms** add-on. It will automatically detect any form page using the **conversational_form** post type (requires Conversational Forms add-on 1.3.0+).
 * **Divi**. It should work with any of the default modules where you can insert a GF shortcode into the content. e.g. Call To Action, Text, Tabs...
 * **Elementor**. The following widgets added to the post content are supported: Shortcode, Text.
 * [Essential Addons for Elementor](https://wordpress.org/plugins/essential-addons-for-elementor-lite/) Gravity Forms widget.
+* GravityKit Gravity Forms Widget for Elementor.
 * **PowerPack for Beaver Builder** Gravity Forms Styler module.
 * [Ultimate Addons for Beaver Builder](https://wordpress.org/plugins/ultimate-addons-for-beaver-builder-lite/) Gravity Forms Styler module.
 * Ultimate Addons for Elementor By Brainstorm Force.
@@ -161,6 +163,11 @@ Use **FreshForms** for the Cookie Name and **no-cache** for the Cookie Values.
 After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
+
+= 1.5.2 =
+
+* Added support for the conversational_form post type introduced in the Conversational Forms add-on 1.3.0 version.
+* Moved check for force options (setting and filter) to an earlier stage.
 
 = 1.5 =
 

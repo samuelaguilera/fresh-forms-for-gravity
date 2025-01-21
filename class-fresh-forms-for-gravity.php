@@ -348,18 +348,6 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return false;
 		}
 
-		// Allow forcing Fresh Form run for certain post ID's without doing the checkings.
-		$force_has_form = $this->get_plugin_setting( 'force_has_form' ) ? $this->get_plugin_setting( 'force_has_form' ) : '';
-		// Remove any empty spaces and convert to array.
-		$force_has_form = array_map( 'intval', explode( ',', preg_replace( '/\s+/', '', $force_has_form ) ) );
-
-		$post_has_gform = apply_filters( 'freshforms_post_has_gform', $force_has_form );
-
-		if ( ! empty( $post_has_gform ) && in_array( $post->ID, $post_has_gform, true ) ) {
-			$this->log_debug( __METHOD__ . "(): Form detection forced to return true by setting or filter for post ID {$post->ID}." );
-			return true;
-		}
-
 		// Check for GF shortcode.
 		if ( true === $this->find_gf_shortcode( $post->post_content ) ) {
 			return true;
@@ -732,6 +720,30 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 			return false;
 		}
 
+		// Allow forcing Fresh Form run for certain post ID's without doing the checkings.
+		$force_has_form = $this->get_plugin_setting( 'force_has_form' ) ? $this->get_plugin_setting( 'force_has_form' ) : '';
+		// Remove any empty spaces and convert to array.
+		$force_has_form = array_map( 'intval', explode( ',', preg_replace( '/\s+/', '', $force_has_form ) ) );
+		// Allow settings to be filtered.
+		$force_has_form = apply_filters( 'freshforms_post_has_gform', $force_has_form );
+
+		// Exclude posts if any ID was provided.
+		if ( ! empty( $force_has_form ) && in_array( $post_id, $force_has_form, true ) ) {
+			$this->log_debug( __METHOD__ . "(): Form detection forced to return true by setting or filter for post ID {$post_id}." );
+			return true;
+		}
+
+		// Get the post_type for Conversational Forms check.
+		$post_type = get_post_type( $post_id );
+		$this->log_debug( __METHOD__ . "(): Post Type is {$post_type}" );
+
+		// Exclude Conversational Forms pages.
+		if ( ! empty( $post_type ) && 'conversational_form' === $post_type ) {
+			$this->log_debug( __METHOD__ . '(): Conversational Forms page detected!' );
+			return true;
+		}
+
+		// Now we want the full post.
 		$post = get_post( $post_id );
 
 		// No Gravity Forms form detected? Do nothing.
