@@ -2,7 +2,7 @@
 Contributors: samuelaguilera
 Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
-Tested up to: 6.7.1
+Tested up to: 6.8.1
 Stable tag: 1.5.4
 Requires PHP: 7.0
 License: GPLv3
