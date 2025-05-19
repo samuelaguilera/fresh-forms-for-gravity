@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent supported caching and JS optimization plugins breaking Gravity Forms.
  * Author: Samuel Aguilera
- * Version: 1.5.3
+ * Version: 1.5.4
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.5.3' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.5.4' );
 
 // Scripts handlers for plugins using them for exclusion filters (e.g. SG Optimizer or Hummingbird). - Defined here to allow WordPress functions to access them.
 define(
@@ -73,6 +73,12 @@ define(
 		'gform_gravityforms_theme_vendors', // 2.7+ (Includes Honeypot hash script).
 		'gform_preview', // Preview window. Just in case...
 		'gform_gravityforms_utils', // 2.7+.
+		'gform_turnstile_vendor_script', // Turnstile add-on.
+		'gform_turnstile_vendor_admin',
+		'gform_turnstile_admin',
+		'gform_turnstile_vendor_theme',
+		'gform_turnstile_theme',
+
 	)
 );
 
@@ -89,6 +95,7 @@ define(
 		'i18n.min.js',
 		'zxcvbn.min.js', // Password strength.
 		'recaptcha',
+		'turnstile',
 	)
 );
 
