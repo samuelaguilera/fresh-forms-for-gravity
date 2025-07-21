@@ -164,6 +164,10 @@ After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
 
+= 1.5.5 =
+
+* Updated data-cfasync exclusion function.
+
 = 1.5.4 =
 
 * Added JS handlers for Turnstile add-on.

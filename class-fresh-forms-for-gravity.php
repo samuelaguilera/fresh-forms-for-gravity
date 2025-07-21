@@ -156,7 +156,7 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		function rocket_loader_exclude_gf_scripts( $tag, $handle, $src ) {
 			if ( is_array( FFFG_JS_HANDLERS ) && in_array( $handle, FFFG_JS_HANDLERS, true ) ) {
 				// Prevent issues with CloudFlare Rocket Loader.
-				$tag = str_replace( "src='", "data-cfasync='false' src='", $tag );
+				$tag = str_replace( 'src="', 'data-cfasync="false" src="', $tag );
 			}
 			return $tag;
 		}
