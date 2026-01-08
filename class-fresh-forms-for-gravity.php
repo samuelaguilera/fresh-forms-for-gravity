@@ -144,7 +144,8 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		}
 
 		// I could check for the CloudFlare plugin, but many people is using CloudFlare without having the plugin installed.
-		add_filter( 'script_loader_tag', 'rocket_loader_exclude_gf_scripts', 99, 3 );
+		add_filter( 'script_loader_tag', 'rocket_loader_exclude_gf_script_files', 99, 3 );
+		add_filter( 'wp_inline_script_attributes', 'rocket_loader_exclude_gf_inline_scripts', 99, 2 );
 
 		/**
 		 * Exclude Gravity Forms scripts from Rocket Loader minification. All Gravity Forms scripts are already minified.
@@ -153,12 +154,31 @@ class Fresh_Forms_For_Gravity extends GFAddOn {
 		 * @param string $handle The script's registered handle.
 		 * @param string $src    The script's source URL.
 		 */
-		function rocket_loader_exclude_gf_scripts( $tag, $handle, $src ) {
+		function rocket_loader_exclude_gf_script_files( $tag, $handle, $src ) {
 			if ( is_array( FFFG_JS_HANDLERS ) && in_array( $handle, FFFG_JS_HANDLERS, true ) ) {
-				// Prevent issues with CloudFlare Rocket Loader.
+				// Prevent issues with CloudFlare Rocket Loader for script files.
 				$tag = str_replace( 'src="', 'data-cfasync="false" src="', $tag );
 			}
 			return $tag;
+		}
+
+		/**
+		 * Exclude Gravity Forms scripts from Rocket Loader minification. All Gravity Forms scripts are already minified.
+		 *
+		 * @param string $attributes Key-value pairs representing <script> tag attributes.
+		 * @param string $data       Inline data.
+		 */
+		function rocket_loader_exclude_gf_inline_scripts( $attributes, $data ) {
+			if ( is_array( FFFG_JS_INLINE_PARTIAL ) ) {
+				foreach ( FFFG_JS_INLINE_PARTIAL as &$inline_script_string ) {
+					if ( str_contains( $data, $inline_script_string ) ) {
+						// Prevent issues with CloudFlare Rocket Loader for inline scripts.
+						$attributes['data-cfasync'] = 'false';
+						break;
+					}
+				}
+			}
+			return $attributes;
 		}
 
 		// All Gravity Forms scripts are already minified.

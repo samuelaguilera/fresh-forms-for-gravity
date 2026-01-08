@@ -3,7 +3,7 @@
  * Plugin Name: Fresh Forms for Gravity
  * Description: Prevent supported caching and JS optimization plugins breaking Gravity Forms.
  * Author: Samuel Aguilera
- * Version: 1.5.5
+ * Version: 1.5.6
  * Author URI: https://www.samuelaguilera.com
  * Text Domain: fresh-forms-for-gravity
  * Domain Path: /languages
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.5.5' );
+define( 'FRESH_FORMS_FOR_GRAVITY_VERSION', '1.5.6' );
 
 // Scripts handlers for plugins using them for exclusion filters (e.g. SG Optimizer or Hummingbird). - Defined here to allow WordPress functions to access them.
 define(
@@ -115,9 +115,9 @@ define(
 		'var stripe', // Stripe Checkout.
 		'gform_gravityforms-js-extra',
 		'gform.initializeOnLoaded',
-		'gform', // Try to catch any other gform based script.
 		'gform_gravityforms_theme-js-extra', // Honeypot.
 		'version_hash', // Honeypot.
+		'gform', // Try to catch any other gform based script.
 	)
 );
 
