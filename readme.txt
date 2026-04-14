@@ -2,7 +2,7 @@
 Contributors: samuelaguilera
 Tags: Gravity Forms, gravityforms, cache, caching
 Requires at least: 4.9
-Tested up to: 6.9
+Tested up to: 6.9.4
 Stable tag: 1.5.6
 Requires PHP: 7.0
 License: GPLv3
@@ -146,7 +146,7 @@ Fresh Forms targets only WordPress caching plugins, it doesn't communicate with 
 
 But there are some WordPress plugins, like Breeze by CloudWays and NitroPack, that while they are created to integrate WordPress with Varnish, they don't support DONOTCACHEPAGE or provide any WordPress filters to exclude content dynamically (at the time of writing this).
 
-But both have support to exclude pages from their cache based on a cookie added. Since Fresh Forms 1.3.4, you can use the freshforms_add_cookie filter in your theme functions.php file or a custom fucntionatliy plugin to make Fresh Forms to add a cookie that you can configure in CloudWays or NitroPack account dashboard.
+But both have support to exclude pages from their cache based on a cookie added. Since Fresh Forms 1.3.4, you can use the freshforms_add_cookie filter in your theme functions.php file or a custom functionality plugin to make Fresh Forms to add a cookie that you can configure in CloudWays or NitroPack account dashboard.
 
 `add_filter( 'freshforms_add_cookie', '__return_true' );`
 
