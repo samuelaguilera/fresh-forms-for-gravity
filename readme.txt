@@ -164,6 +164,11 @@ After doing the above, you need to **flush your host and browser cache**.
 
 == Changelog ==
 
+= 1.5.8 =
+
+* Minor code refactor for helper functions placement.
+* Changed page cache exclusion method for Speed Optimizer from cookie to sgo_exclude_urls_from_cache filter.
+
 = 1.5.6 =
 
 * Added support for data-cfasync to inline scripts. Although Cloudflare's documentation doesn't mention support of this attribute for inline scripts, in practice adding it seems to exclude them from Rocket Loader. Thanks to Richard Wawrzyniak for the suggestion.
